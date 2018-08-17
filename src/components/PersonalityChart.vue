@@ -1,5 +1,5 @@
 <template>
-<v-card class="chart-card">
+<v-card class="chart-card" raised>
     <v-card-title>
         <h3>{{ chartTitle }}</h3>
     </v-card-title>
@@ -109,7 +109,7 @@
 
 <style>
 .chart-card {
-    background: hsla(231.4,43.8%,93.7%, 0.35) !important;
+    /*background: hsla(231.4,43.8%,93.7%, 0.35) !important;*/
 }
 
   .chart-container {

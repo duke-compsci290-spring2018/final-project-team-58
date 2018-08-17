@@ -3,7 +3,7 @@ import {
     TWITTER_CONSUMER_SECRET,
     TWITTER_ACCESS_TOKEN,
     TWITTER_ACCESS_TOKEN_SECRET
-} from './../secrets';
+} from './../secrets.js';
 
 import Twit from "twit"
 

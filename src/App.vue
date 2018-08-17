@@ -2,8 +2,11 @@
   <div id="app">
     <v-app>
       <v-toolbar absolute color="transparent" flat height="80px">
+        <v-btn fab small v-if="submitted">
+          <v-icon>arrow_back</v-icon>
+        </v-btn>
         <v-speed-dial v-if="currUser" v-model="userOptions" absolute bottom right direction="left" transition="slide-x-reverse-transition">
-          <v-btn slot="activator" fab v-model="userOptions">
+          <v-btn slot="activator" fab small v-model="userOptions">
             <v-icon>account_circle</v-icon>
             <v-icon>close</v-icon>
           </v-btn>
@@ -32,10 +35,41 @@
   
       <v-content v-if="!submitted">
         <search :submit-search="submitSearch"></search>
-            <results></results>
+            <results :search-query="searchQuery"></results>
       </v-content>
       <v-content v-if="submitted">
       </v-content>
+      <v-footer
+        dark
+    height="auto"
+  >
+    <v-card
+      flat
+      tile
+      class="indigo lighten-1 white--text text-xs-center"
+    >
+      <v-card-text>
+        <v-btn
+          v-for="icon in icons"
+          :key="icon"
+          class="mx-3 white--text"
+          icon
+        >
+          <v-icon size="24px">{{ icon }}</v-icon>
+        </v-btn>
+      </v-card-text>
+
+      <v-card-text class="white--text pt-0">
+        Phasellus feugiat arcu sapien, et iaculis ipsum elementum sit amet. Mauris cursus commodo interdum. Praesent ut risus eget metus luctus accumsan id ultrices nunc. Sed at orci sed massa consectetur dignissim a sit amet dui. Duis commodo vitae velit et faucibus. Morbi vehicula lacinia malesuada. Nulla placerat augue vel ipsum ultrices, cursus iaculis dui sollicitudin. Vestibulum eu ipsum vel diam elementum tempor vel ut orci. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.
+      </v-card-text>
+
+      <v-divider></v-divider>
+
+      <v-card-text class="white--text">
+        &copy;2018 <strong>Alina Walling</strong>
+      </v-card-text>
+    </v-card>
+  </v-footer>
     </v-app>
   </div>
 </template>
@@ -201,11 +235,9 @@
 
 <style>
   #app {
-    background: #de6161;
-    /* fallback for old browsers */
-    background: -webkit-linear-gradient(to top, #2657eb, #de6161);
-    /* Chrome 10-25, Safari 5.1-6 */
-    background: linear-gradient(to top, #2657eb, #de6161);
-    /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+    background: #3A1C71;  /* fallback for old browsers */
+background: -webkit-linear-gradient(to top, #FFAF7B, #D76D77, #3A1C71);  /* Chrome 10-25, Safari 5.1-6 */
+background: linear-gradient(to top, #FFAF7B, #D76D77, #3A1C71); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+
   }
 </style>

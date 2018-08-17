@@ -1,8 +1,51 @@
 <template>
+<v-container>
+    <v-jumbotron>
+        <v-container fill-height>
+      <v-layout row wrap align-center justify-center>
+        <v-flex xs12 text-xs-center>
+          <h3 class="display-3">{{ searchQuery }} heck</h3>
+        </v-flex>
+        <v-flex sm4>
+            <v-card color="transparent" flat>
+                      <v-card-text>
+                          <v-icon>access_time</v-icon>
+                          Searched on
+                          <br>
+                          <v-icon>fas fa-twitter</v-icon>
+                          Tweets Analyzed
+                  <br>
+                  Strength of Data Analysis
+                      </v-card-text>
+                  
+            </v-card>
+        </v-flex>
+        <v-flex sm4>
+                  <v-card color="transparent" flat>
+                      <v-card-text>
+                          Number of Tweets Analyzed:
+                  <br>
+                  Strength of Data Analysis:
+                      </v-card-text>
+                  
+                  </v-card>
+        </v-flex>
+
+          <v-btn round>
+            <v-icon left size="20">bookmark_border</v-icon>
+            Save Search
+              </v-btn>
+        </v-flex>
+      </v-layout>
+    </v-container>
+    </v-jumbotron>
     <v-container fluid grid-list-md>
         <v-layout row wrap>
             <v-flex xs12 md6>
                 <tone-chart :tones="tones"></tone-chart>
+            </v-flex>
+            <v-flex xs12 md6>
+                <results-summary></results-summary>
             </v-flex>
             <v-flex xs12 sm6 md4 d-flex>
                 <personality-summary></personality-summary>
@@ -28,6 +71,7 @@
             </v-flex>
         </v-layout>
     </v-container>
+</v-container>
 </template>
 
 <script>
@@ -35,17 +79,22 @@
     import PersonalityPreferences from "./PersonalityPreferences.vue"
   import PersonalityChart from "./PersonalityChart.vue"
   import ToneChart from "./ToneChart.vue"
-      import traits from "./../../static/data/personality-test.json"
-      import tones from "./../../static/data/tone-test.json"
+      import traits from "./../assets/data/personality-test.json"
+      import tones from "./../assets/data/tone-test.json"
+      import ResultsSummary from "./ResultsSummary.vue"
 
     export default {
         name: 'Results',
-        //props: ["personalityResults"],
+        props: [
+            //"personalityResults"
+            "searchQuery"
+        ],
         components: {
             PersonalitySummary,
             PersonalityPreferences,
             PersonalityChart,
-            ToneChart
+            ToneChart,
+            ResultsSummary
         },
 
         data () {

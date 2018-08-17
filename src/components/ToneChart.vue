@@ -1,8 +1,17 @@
 <template>
-<v-card id="tones-chart">
-    <v-card-title>
-        <h3>Tones</h3>
-    </v-card-title>
+    <v-card id="tones-chart">
+        <v-toolbar card flat>
+            <v-toolbar-title>Tones</v-toolbar-title>
+            <v-spacer></v-spacer>
+            <v-btn icon>
+                <v-icon>info</v-icon>
+            </v-btn>
+
+        </v-toolbar>
+        <!--<v-card-title primary-title>
+            <h3 class="headline">Tones</h3>
+            <div>Subtitle</div>
+        </v-card-title>-->
     <div class="chart-container">
     <svg id="tones"></svg>
   </div>
@@ -73,6 +82,18 @@ import * as d3 from "d3";
                 return "translate(100, " + mid + ")";
             });
 
+            svg.selectAll(".tone-score")
+            .append("text")
+            .text(function (d) {
+                return Math.round(d.score * 100) / 100;
+            })
+            .attr("class", "tone-score")
+            .attr("text-anchor", "end")
+            .attr("transform", function (d, i) {
+                var mid = 45 + i * 45;
+                return "translate(" + (110 + x(d.score)) + ", " + mid + ")";
+            });
+
         },
 
         methods: {
@@ -104,14 +125,16 @@ import * as d3 from "d3";
 </script>
 
 <style>
-#tones-chart {
-    background: rgba(255, 255, 255, 0.9);
-}
-
 .tone-label {
     font-size: 14px;
     letter-spacing: 0.25px;
     fill: rgba(0,0,0,0.8);
+}
+
+.tone-score {
+    font-size: 12px;
+    letter-spacing: 0.5;
+    fill: white;
 }
     
 </style>
