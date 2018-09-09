@@ -11,9 +11,13 @@
   },
   "dependencies": {
     "d3": "^5.5.0",
+    "dotenv": "^6.0.0",
     "firebase": "^5.4.0",
+    "get-twitter-bearer-token": "^1.0.0",
     "material-design-icons-iconfont": "^3.0.3",
+    "request": "^2.88.0",
     "twit": "^2.2.11",
+    "twitter": "^1.7.1",
     "vue": "^2.5.11",
     "vuefire": "^1.4.5",
     "vuetify": "^1.1.13",

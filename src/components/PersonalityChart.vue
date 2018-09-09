@@ -1,11 +1,22 @@
 <template>
-<v-card class="chart-card" raised>
-    <v-card-title>
-        <h3>{{ chartTitle }}</h3>
-    </v-card-title>
+    <v-card id="chart-card" raised>
+        <v-toolbar card flat v-if="header">
+            <v-toolbar-title>{{ chartTitle }}</v-toolbar-title>
+            <v-spacer></v-spacer>
+            <v-btn icon>
+                <v-icon @click="infoPanel = !infoPanel">info_outline</v-icon>
+            </v-btn>
+        </v-toolbar>
+        <v-container>
+            <v-expansion-panel class="info-panel">
+                <v-expansion-panel-content v-model="infoPanel">
+                    <v-card-text>yooo</v-card-text>
+                </v-expansion-panel-content>
+            </v-expansion-panel>
     <div class="chart-container">
     <svg :id="chartID"></svg>
   </div>
+        </v-container>
 </v-card>
 </template>
 
@@ -14,10 +25,11 @@
     import * as d3 from "d3";
     export default {
         name: 'PersonalityChart',
-        props: ["traits", "chartID"],
+        props: ["traits", "chartID", "header"],
 
         data () {
             return {
+                infoPanel: false,
                 currTraits: this.traits
             }
         },
@@ -65,7 +77,7 @@
                 });
             })
             .attr("fill", function (d, i) {
-                return d3.interpolateMagma(1 - i / app.currTraits.length);
+                return d3.interpolateMagma(0.9 - i / app.currTraits.length);
             })
             .attr("transform", "rotate(180)");
 
@@ -76,7 +88,7 @@
             })
             .attr("class", "trait-label")
             .attr("fill", function (d, i) {
-                return d3.interpolateMagma(1 - i / app.currTraits.length);
+                return d3.interpolateMagma(0.9 - i / app.currTraits.length);
             })
             .attr("transform", function (d, i) {
                 var y = (i + 1) * 20 + 55;

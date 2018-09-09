@@ -1,15 +1,16 @@
 <template>
-    <v-card class="elevation-12">
-        <v-toolbar tabs dark color="purple darken-4">
-            <v-tabs grow v-model="tabs" color="purple darken-4" slider-color="cyan">
-                <v-tab>
-                    Sign In
-                </v-tab>
-                <v-tab>
-                    Sign Up
-                </v-tab>
-            </v-tabs>
-        </v-toolbar>
+<v-card class="elevation-12">
+    <v-toolbar dense dark color="purple darken-4">
+        <v-tabs grow v-model="tabs" color="transparent" slider-color="cyan">
+            <v-tab>
+                Login
+            </v-tab>
+            <v-tab>
+                Register
+            </v-tab>
+        </v-tabs>
+    </v-toolbar>
+    <v-container>
         <v-tabs-items v-model="tabs">
             <v-tab-item>
                 <v-card-text>
@@ -21,7 +22,7 @@
                 <v-card-actions>
                     <v-spacer></v-spacer>
                     <v-btn color="blue-grey darken-2" dark flat>Forgot Password</v-btn>
-                    <v-btn color="cyan" dark depressed @click="submitLogin(false)">Sign In</v-btn>
+                    <v-btn color="cyan" dark depressed @click="submitLogin(false)">Login</v-btn>
                 </v-card-actions>
             </v-tab-item>
             <v-tab-item>
@@ -34,78 +35,62 @@
                 </v-card-text>
                 <v-card-actions>
                     <v-spacer></v-spacer>
-                    <v-btn color="cyan" dark depressed @click="submitLogin(true)">Sign Up</v-btn>
+                    <v-btn color="cyan" dark depressed @click="submitLogin(true)">Register</v-btn>
                 </v-card-actions>
-    
             </v-tab-item>
         </v-tabs-items>
-    </v-card>
+    </v-container>
+</v-card>
 </template>
 
 <script>
-    export default {
-        name: 'LoginForm',
-    
-        props: ["signIn", "signUp"],
-    
-        components: {
-    
-    
-        },
-    
-        data() {
-            return {
-                tabs: null,
-                rules: {
-                    name: [
-                        v => !!v || 'Name is required',
-                        v => (v && v.length <= 30) || 'Name must be less than 30 characters'
-                    ],
-                    email: [
-                        v => !!v || 'Email address is required',
-                        v => /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(v) || 'Email address is not valid'
-                    ],
-                    password: [
-                        v => (v && v.length >= 6) || 'Password must be at least 6 characters'
-                    ]
-                },
-                returningUser: {
-                    valid: false,
-                    email: "",
-                    password: ""
-                },
-                newUser: {
-                    valid: false,
-                    name: "",
-                    email: "",
-                    password: ""
-                }
+export default {
+    name: 'LoginForm',
+
+    props: ["login", "register"],
+
+    data() {
+        return {
+            tabs: null,
+            rules: {
+                name: [
+                    v => !!v || 'Name is required',
+                    v => (v && v.length <= 30) || 'Name must be less than 30 characters'
+                ],
+                email: [
+                    v => !!v || 'Email address is required',
+                    v => /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(v) || 'Email address is not valid'
+                ],
+                password: [
+                    v => (v && v.length >= 6) || 'Password must be at least 6 characters'
+                ]
+            },
+            returningUser: {
+                valid: false,
+                email: "",
+                password: ""
+            },
+            newUser: {
+                valid: false,
+                name: "",
+                email: "",
+                password: ""
             }
-        },
-    
-        created: function() {
-    
-        },
-    
-        computed: {
-    
-    
-    
-        },
-    
-        methods: {
-            submitLogin (newAccount) {
-                if (newAccount && this.newUser.valid) {
-                    this.signUp(this.newUser.name, this.newUser.email, this.newUser.password);
-                } else if (!newAccount && this.returningUser.valid) {
-                    this.signIn(this.returningUser.email, this.returningUser.password);
-                }
+        }
+    },
+
+    methods: {
+        submitLogin(newAccount) {
+            if (newAccount && this.newUser.valid) {
+                this.register(this.newUser.name, this.newUser.email, this.newUser.password);
+            } else if (!newAccount && this.returningUser.valid) {
+                this.login(this.returningUser.email, this.returningUser.password);
             }
-    
         }
     }
+}
 </script>
 
 <style>
-    
+
 </style>
