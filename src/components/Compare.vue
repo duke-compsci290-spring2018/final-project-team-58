@@ -66,10 +66,10 @@
                 <h2 class="display-1 font-weight-light mb-3 white--text">Personality Summary</h2>
             </v-flex>
             <v-flex xs12 sm6 d-flex>
-                <personality-summary :header="false"></personality-summary>
+                <personality-summary :header="false" :text-summary="resultsA.summary"></personality-summary>
             </v-flex>
             <v-flex xs12 sm6 d-flex>
-                <personality-summary :header="false"></personality-summary>
+                <personality-summary :header="false" :text-summary="resultsB.summary"></personality-summary>
             </v-flex>
         </v-layout>
 
@@ -165,6 +165,7 @@ export default {
                 numTweets: this.searchA.numTweets,
                 numWords: this.searchA.numWords,
                 tones: this.searchA.tones,
+                summary: this.searchA.summary,
                 traits: this.searchA.traits,
                 needs: this.searchA.needs,
                 values: this.searchA.values,
@@ -177,6 +178,7 @@ export default {
                 numTweets: this.searchB.numTweets,
                 numWords: this.searchB.numWords,
                 tones: this.searchB.tones,
+                summary:this.searchB.summary,
                 traits: this.searchB.traits,
                 needs: this.searchB.needs,
                 values: this.searchB.values,
