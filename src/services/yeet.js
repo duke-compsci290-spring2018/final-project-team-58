@@ -1,8 +1,8 @@
 export const request = require("request");
 
 export const twitterSearchAuth = {
-    consumer_key: "hzpbBZl9Fh9OI11fx4CtnZLKf",
-    consumer_secret: "Yniz3bWqNykpAXUvJswb2MXGkrQTDUpUknX3IY3goPEAHbocc3"
+    consumer_key: "v88r6lWdrpiiYFrcYVZtwN4gx",
+    consumer_secret: "nvbKZnwuOpBajOKjGIJtBKfhtGOpdlp8GLNO46HoqIFIWvLCT7"
     //access_token_key: process.env.TWITTER_ACCESS_TOKEN,
     //access_token_secret: process.env.TWITTER_ACCESS_TOKEN_SECRET
 }

@@ -559,8 +559,7 @@ export default {
                 oauth: twitterSearchAuth,
                 json: true,
                 headers: {
-                    "content-type": "application/json",
-                    "Access-Control-Allow-Origin": "*"
+                    "content-type": "application/json"
                 },
                 body: query,
                 withCredentials: false
