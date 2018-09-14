@@ -559,10 +559,12 @@ export default {
                 oauth: twitterSearchAuth,
                 json: true,
                 headers: {
-                    "content-type": "application/json"
+                    "content-type": "application/json",
+                    "Access-Control-Allow-Origin": "*"
                 },
                 body: query,
                 withCredentials: false
+                
             }
 
             request.post(requestOptions, function (error, response, body) {
