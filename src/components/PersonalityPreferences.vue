@@ -1,9 +1,19 @@
 <template>
-    <v-card class="preferences" :class="{ likely: likely }" dark>
-        <v-card-title>
-            <h3>Users are {{ isLikely }} to...</h3>
-        </v-card-title>
-        <v-list class="pref-list">
+    <v-card raised>
+    <v-toolbar card flat v-if="header">
+        <v-toolbar-title>Users are {{ isLikely }} to...</v-toolbar-title>
+        <v-spacer></v-spacer>
+        <v-btn icon>
+            <v-icon @click="infoPanel = !infoPanel">info_outline</v-icon>
+        </v-btn>
+    </v-toolbar>
+    <v-container>
+        <v-expansion-panel class="info-panel">
+            <v-expansion-panel-content v-model="infoPanel">
+                <v-card-text>yooo</v-card-text>
+            </v-expansion-panel-content>
+        </v-expansion-panel>
+        <v-list class="pref-list" two-line>
             <v-list-tile v-for="pref in topPrefs" avatar>
                 <v-list-tile-avatar color="indigo lighten-5">
                     <v-icon size="20" v-show="likely" color="indigo accent-2">thumb_up</v-icon>
@@ -14,16 +24,18 @@
                 </v-list-tile-content>
             </v-list-tile>
         </v-list>
-    </v-card>
+    </v-container>
+</v-card>
 </template>
 
 <script>
 
     export default {
         name: 'PersonalityPreferenes',
-        props: ["likely", "behaviors"],
+        props: ["likely", "behaviors", "header"],
         data () {
             return {
+                infoPanel: false,
                 topPrefs: this.behaviors
             }
         },
