@@ -49,8 +49,7 @@
             <search v-if="page == 'home'" :submit-search="submitSearch" :display-message="displayMessage"></search>
             <results v-if="page == 'results'" :results="results" :is-bookmark="isBookmark" :bookmark-save="updateBookmark" :signed-in="signedIn"></results>
             <compare v-if="page == 'compare'" :search-a="toCompare[0]" :search-b="toCompare[1]"></compare>
-            <account-settings v-if="goToAccountPage" :user="user" :curr-tab="page" :view-bookmark="viewBookmark" :compare-bookmarks="compareResults" :delete-bookmark="deleteBookmark" :delete-all-bookmarks="deleteAllBookmarks" :delete-history-item="deleteHistoryItem"
-                :delete-all-history="deleteAllHistory" :update-profile="updateProfile" :update-password="updatePassword" :delete-account="deleteAccount" :set-page="setPage" :master-history="masterHistory" :delete-guest-history="deleteGuestHistory" :admin="admin['.value']"></account-settings>
+            <account-settings v-if="goToAccountPage" :user="user" :curr-tab="page" :view-bookmark="viewBookmark" :compare-bookmarks="compareResults" :delete-bookmark="deleteBookmark" :delete-all-bookmarks="deleteAllBookmarks" :delete-history-item="deleteHistoryItem" :delete-all-history="deleteAllHistory" :update-profile="updateProfile" :update-password="updatePassword" :delete-account="deleteAccount" :set-page="setPage" :master-history="masterHistory" :delete-guest-history="deleteGuestHistory" :admin="admin['.value']"></account-settings>
         </v-content>
         <!--<v-footer dark height="auto">
             <v-card flat tile class="indigo lighten-1 white--text text-xs-center">
@@ -137,7 +136,7 @@ export default {
         guestHistory: db.ref("users/guest/history")
     },
 
-    data() {
+    data () {
         return {
             message: {
                 visible: false,
@@ -432,29 +431,29 @@ export default {
 
             this.results.id = Date.now(),
                 this.results.query = q;
-                this.searchTweets();
+            this.searchTweets();
             //this.results.numTweets = 0;
 
-           /* if (q == "one") {
-                this.results.tones = this.toneTests[0];
-                this.results.personality = this.personalityTests[0];
-            } else if (q == "two") {
-                this.results.tones = this.toneTests[1];
-                this.results.personality = this.personalityTests[1];
-            } else if (q == "three") {
-                this.results.tones = this.toneTests[2];
-                this.results.personality = this.personalityTests[2];
-            } else if (q == "four") {
-                this.results.tones = this.toneTests[3];
-                this.results.personality = this.personalityTests[3];
-            } else {
-                this.displayMessage("Problem.");
-                this.resetResults();
-                return;
-            }
+            /* if (q == "one") {
+                 this.results.tones = this.toneTests[0];
+                 this.results.personality = this.personalityTests[0];
+             } else if (q == "two") {
+                 this.results.tones = this.toneTests[1];
+                 this.results.personality = this.personalityTests[1];
+             } else if (q == "three") {
+                 this.results.tones = this.toneTests[2];
+                 this.results.personality = this.personalityTests[2];
+             } else if (q == "four") {
+                 this.results.tones = this.toneTests[3];
+                 this.results.personality = this.personalityTests[3];
+             } else {
+                 this.displayMessage("Problem.");
+                 this.resetResults();
+                 return;
+             }
 
-            this.addHistoryItem(this.results);
-            this.displayResults();*/
+             this.addHistoryItem(this.results);
+             this.displayResults();*/
             /*
                         if (this.searchTweets()) {
                             if (this.analyzeTone()) {
@@ -566,7 +565,6 @@ export default {
                 withCredentials: false
             }
 
-
             request.post(requestOptions, function (error, response, body) {
                 if (error) {
                     console.log(error);
@@ -574,9 +572,6 @@ export default {
                 }
                 console.log(body);
             })
-
-            
-
 
             /*
                         var app = this;
