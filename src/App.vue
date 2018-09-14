@@ -555,7 +555,7 @@ export default {
             }
 
             var requestOptions = {
-                url: "https://" + twitterSearchConfig["url"] + twitterSearchConfig["env"] + ".json",
+                url: "https://cors-anywhere.herokuapp.com/" + "https://" + twitterSearchConfig["url"] + twitterSearchConfig["env"] + ".json",
                 oauth: twitterSearchAuth,
                 json: true,
                 headers: {
