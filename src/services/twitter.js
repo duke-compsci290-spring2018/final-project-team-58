@@ -20,7 +20,7 @@ getBearerToken(TWITTER_CONSUMER_KEY, TWITTER_CONSUMER_SECRET, (error, response) 
   }
 });*/
 
-
+/*
 var R = require("request");
 
 var key = TWITTER_CONSUMER_KEY;
@@ -59,11 +59,11 @@ R.post({ url: url,
     TWITTER_BEARER_TOKEN = body;
   }
 });
-
+*/
 export const twitter = new TwitterClient({
     consumer_key: TWITTER_CONSUMER_KEY,
     consumer_secret: TWITTER_CONSUMER_SECRET,
-    //access_token_key: TWITTER_ACCESS_TOKEN,
-    //access_token_secret: TWITTER_ACCESS_TOKEN_SECRET
-    bearer_token: TWITTER_BEARER_TOKEN
+    access_token_key: TWITTER_ACCESS_TOKEN,
+    access_token_secret: TWITTER_ACCESS_TOKEN_SECRET
+    //bearer_token: TWITTER_BEARER_TOKEN
   });

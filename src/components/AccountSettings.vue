@@ -14,6 +14,9 @@
                             <v-tab href="#account-history">
                                 <v-icon dark>history</v-icon>
                             </v-tab>
+                            <v-tab href="#account-master-history" v-if="user['.key'] == admin">
+                                <v-icon dark>supervised_user_circle</v-icon>
+                            </v-tab>
                             <v-tab href="#account-settings">
                                 <v-icon dark>settings</v-icon>
                             </v-tab>
@@ -46,7 +49,7 @@
                                 <v-alert slot="no-results" :value="true" color="error" icon="warning">
                                     Your search for "{{ bookmarkSearch }}" found no results.
                                 </v-alert>
-                                
+
                             </v-data-table>
                             <v-card-actions>
                                 <v-spacer></v-spacer>
@@ -82,11 +85,34 @@
                             </v-card-actions>
                         </v-tab-item>
 
+                        <v-tab-item id="account-master-history" v-if="user['.key'] == admin">
+                            <v-card-title>
+                                <h5 class="title mb-0 mt-2">Master History</h5>
+                                <v-spacer></v-spacer>
+                                <v-text-field v-model="masterHistorySearch" append-icon="search" label="Search Master History" single-line hide-details color="cyan"></v-text-field>
+                            </v-card-title>
+                            <v-data-table :headers="masterHistoryHeaders" :items="allHistory" :search="masterHistorySearch" class="my-3">
+
+                                <template slot="items" slot-scope="props">
+                                    <td>{{ props.item.name }}</td>
+                                    <td class="text-xs">{{ props.item.timestamp }}</td>
+                                    <td class="text-xs">{{ props.item.user }}</td>
+                                </template>
+                                <v-alert slot="no-results" :value="true" color="error" icon="warning">
+                                    Your search for "{{ masterHistorySearch }}" found no results.
+                                </v-alert>
+                            </v-data-table>
+                            <v-card-actions>
+                                <v-spacer></v-spacer>
+                                <v-btn color="error" depressed @click="deleteGuestHistory" :disabled="!isGuestHistory">Clear Guest History</v-btn>
+                            </v-card-actions>
+                        </v-tab-item>
+
                         <v-tab-item id="account-settings">
                             <v-card-title>
                                 <h5 class="title">Profile</h5>
                                 <v-spacer></v-spacer>
-                                <h5 class="body-2 grey--text text-uppercase">Administrator</h5>
+                                <h5 class="body-2 grey--text text-uppercase" v-if="user['.key'] == admin">Administrator</h5>
                             </v-card-title>
                             <v-form>
                                 <v-text-field v-model="editUser.name" prepend-icon="face" name="name" label="Name" type="text" color="cyan" :rules="rules.name"></v-text-field>
@@ -136,6 +162,7 @@ export default {
 
     props: [
         "user",
+        "admin",
         "currTab",
         "setPage",
         "viewBookmark",
@@ -144,6 +171,8 @@ export default {
         "deleteAllBookmarks",
         "deleteHistoryItem",
         "deleteAllHistory",
+        "masterHistory",
+        "deleteGuestHistory",
         "updateProfile",
         "updatePassword",
         "deleteAccount"
@@ -171,10 +200,31 @@ export default {
                     sortable: false
                 }
             ],
+            masterHistoryHeaders: [{
+                    text: "Hashtag",
+                    align: "left",
+                    sortable: true,
+                    value: "name"
+                },
+                {
+                    text: "Date Searched",
+                    align: "left",
+                    sortable: true,
+                    value: "timestamp"
+                },
+                {
+                    text: "User",
+                    align: "left",
+                    sortable: true,
+                    value: "user"
+                }
+            ],
             bookmarks: this.getBookmarks(),
             bookmarkSearch: "",
             history: this.getHistory(),
             historySearch: "",
+            allHistory: this.masterHistory,
+            masterHistorySearch: "",
             editUser: {
                 name: this.user.name,
                 email: this.user.email,
@@ -194,15 +244,28 @@ export default {
                     v => (v && v.length >= 6) || 'Password must be at least 6 characters'
                 ]
             }
-        };
+        }
     },
 
     computed: {
-        numSelected () {
+        numSelected() {
             if (this.selected.length >= 2) {
                 return true;
-            } 
+            }
             return false;
+        },
+
+        isGuestHistory() {
+            if (this.allHistory) {
+
+                for (var i = 0; i < this.allHistory.length; i++) {
+                    if (this.allHistory[i].user == "Guest") {
+                        return true;
+                    }
+                }
+            }
+            return false;
+
         }
     },
 
@@ -214,11 +277,15 @@ export default {
         user: function () {
             this.bookmarks = this.getBookmarks();
             this.history = this.getHistory();
+        },
+
+        masterHistory: function () {
+            this.allHistory = this.masterHistory;
         }
     },
 
     methods: {
-        getBookmarks () {
+        getBookmarks() {
             var b = [];
             for (var bookmark in this.user.bookmarks) {
                 var add = this.user.bookmarks[bookmark];
@@ -228,7 +295,7 @@ export default {
             return b;
         },
 
-        getHistory () {
+        getHistory() {
             var h = [];
             for (var item in this.user.history) {
                 var add = this.user.history[item];
@@ -251,7 +318,7 @@ export default {
         disableCheckbox(item) {
             if (!this.numSelected || this.selected.includes(item)) {
                 return false;
-            } 
+            }
             return true;
         }
     }

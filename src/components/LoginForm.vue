@@ -21,7 +21,6 @@
                 </v-card-text>
                 <v-card-actions>
                     <v-spacer></v-spacer>
-                    <v-btn color="blue-grey darken-2" dark flat>Forgot Password</v-btn>
                     <v-btn color="cyan" dark depressed @click="submitLogin(false)">Login</v-btn>
                 </v-card-actions>
             </v-tab-item>

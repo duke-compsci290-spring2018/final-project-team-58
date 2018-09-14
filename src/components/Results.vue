@@ -23,10 +23,13 @@
                     </p>
                 </v-flex>
                 <v-flex sm3 class="text-xs-center">
-                    <v-btn fab large @click="updateBookmark" color="pink lighten-2">
+                    <v-btn fab large @click="updateBookmark" color="pink lighten-2" v-if="signedIn">
                         <v-icon v-if="!bookmarked" color="white" large>bookmark_border</v-icon>
                         <v-icon v-if="bookmarked" color="white" large>bookmark</v-icon>
                     </v-btn>
+                    <v-card v-if="!signedIn">
+                    <v-card-text class="body-2">Sign in or create an account to bookmark these results.</v-card-text>
+                    </v-card>
 
                 </v-flex>
             </v-layout>
@@ -34,25 +37,25 @@
     </v-jumbotron>
     <v-container fluid grid-list-lg>
         <v-layout row wrap>
-            <v-flex xs12 md6>
+            <v-flex xs12 md6 d-flex>
                 <tone-chart chartID="tones" :tones="tones" :header="true"></tone-chart>
             </v-flex>
             <v-flex xs12 sm6 d-flex>
-                <personality-summary :header="true"></personality-summary>
+                <personality-summary :header="true" :text-summary="summary"></personality-summary>
             </v-flex>
-            <v-flex xs12 sm6 md4>
+            <v-flex xs12 sm6 md4 d-flex>
                 <personality-chart chartID="personality" :traits="traits" :header="true"></personality-chart>
             </v-flex>
-            <v-flex xs12 sm6 md4>
+            <v-flex xs12 sm6 md4 d-flex>
                 <personality-chart chartID="needs" :traits="needs" :header="true"></personality-chart>
             </v-flex>
-            <v-flex xs12 sm6 md4>
+            <v-flex xs12 sm6 md4 d-flex>
                 <personality-chart chartID="values" :traits="values" :header="true"></personality-chart>
             </v-flex>
-            <v-flex xs12 sm6>
+            <v-flex xs12 sm6 d-flex>
                 <personality-preferences :likely="true" :behaviors="likelyPrefs" :header="true"></personality-preferences>
             </v-flex>
-            <v-flex xs12 sm6>
+            <v-flex xs12 sm6 d-flex>
                 <personality-preferences :likely="false" :behaviors="unlikelyPrefs" :header="true"></personality-preferences>
             </v-flex>
 
@@ -68,9 +71,15 @@ import PersonalityChart from "./PersonalityChart.vue"
 import ToneChart from "./ToneChart.vue"
 import ResultsSummary from "./ResultsSummary.vue"
 
+ var PersonalityTextSummaries = require('personality-text-summary');
+
+  // locale is one of {'en', 'es', 'ja', 'ko'}.  version refers to which version of Watson Personality Insights to use, v2 or v3.
+  var v3EnglishTextSummaries = new PersonalityTextSummaries({ locale: 'en', version: 'v3' });
+
 export default {
     name: 'Results',
     props: [
+        "signedIn",
         "results",
         "isBookmark",
         "bookmarkSave"
@@ -90,6 +99,7 @@ export default {
             numTweets: 0,
             numWords: 0,
             tones: [],
+            summary: "",
             traits: [],
             needs: [],
             values: [],
@@ -107,6 +117,7 @@ export default {
             this.numTweets = this.results.numTweets;
             this.numWords = this.results.numWords;
             this.tones = this.results.tones;
+            this.summary = this.results.summary;
             this.traits = this.results.traits;
             this.needs = this.results.needs;
             this.values = this.results.values;
@@ -119,6 +130,7 @@ export default {
             this.numTweets = this.results.numTweets;
             this.numWords = this.results.personality["word_count"];
             this.tones = this.results.tones["document_tone"]["tones"];
+            this.summary = v3EnglishTextSummaries.getSummary(this.results.personality);
             this.traits = this.results.personality["personality"];
             this.needs = this.results.personality["needs"];
             this.values = this.results.personality["values"];
@@ -156,6 +168,7 @@ export default {
                     numTweets: this.numTweets,
                     numWords: this.numWords,
                     tones: this.tones,
+                    summary: this.summary,
                     traits: this.traits,
                     needs: this.needs,
                     values: this.values,

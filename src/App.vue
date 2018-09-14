@@ -9,7 +9,7 @@
         </v-snackbar>
         <v-toolbar color="transparent" flat height="80px">
 
-            <v-btn fab small v-if="page['.value'] != 'home'" @click="goTo('home')">
+            <v-btn fab small v-if="page != 'home'" @click="goTo('home')">
                 <v-icon>arrow_back</v-icon>
             </v-btn>
             <v-speed-dial v-if="signedIn" v-model="userOptions" absolute bottom right direction="left" transition="slide-x-reverse-transition">
@@ -46,11 +46,11 @@
         </v-layout>
 
         <v-content>
-            <search v-if="page['.value'] == 'home'" :submit-search="submitSearch" :display-message="displayMessage"></search>
-            <results v-if="page['.value'] == 'results'" :results="results" :is-bookmark="isBookmark" :bookmark-save="updateBookmark"></results>
-            <compare v-if="page['.value'] == 'compare'" :search-a="toCompare[0]" :search-b="toCompare[1]"></compare>
-            <account-settings v-if="goToAccountPage" :user="user" :curr-tab="page['.value']" :view-bookmark="viewBookmark" :compare-bookmarks="compareResults" :delete-bookmark="deleteBookmark" :delete-all-bookmarks="deleteAllBookmarks" :delete-history-item="deleteHistoryItem"
-                :delete-all-history="deleteAllHistory" :update-profile="updateProfile" :update-password="updatePassword" :delete-account="deleteAccount" :set-page="setPage"></account-settings>
+            <search v-if="page == 'home'" :submit-search="submitSearch" :display-message="displayMessage"></search>
+            <results v-if="page == 'results'" :results="results" :is-bookmark="isBookmark" :bookmark-save="updateBookmark" :signed-in="signedIn"></results>
+            <compare v-if="page == 'compare'" :search-a="toCompare[0]" :search-b="toCompare[1]"></compare>
+            <account-settings v-if="goToAccountPage" :user="user" :curr-tab="page" :view-bookmark="viewBookmark" :compare-bookmarks="compareResults" :delete-bookmark="deleteBookmark" :delete-all-bookmarks="deleteAllBookmarks" :delete-history-item="deleteHistoryItem"
+                :delete-all-history="deleteAllHistory" :update-profile="updateProfile" :update-password="updatePassword" :delete-account="deleteAccount" :set-page="setPage" :master-history="masterHistory" :delete-guest-history="deleteGuestHistory" :admin="admin['.value']"></account-settings>
         </v-content>
         <!--<v-footer dark height="auto">
             <v-card flat tile class="indigo lighten-1 white--text text-xs-center">
@@ -88,6 +88,13 @@ import {
     auth,
     db
 } from "./services/firebase"
+
+import {
+    request,
+    twitterSearchAuth,
+    twitterSearchConfig
+} from "./services/yeet"
+
 import Search from "./components/Search.vue"
 import Results from "./components/Results.vue"
 import LoginForm from "./components/LoginForm.vue"
@@ -115,10 +122,19 @@ export default {
     },
 
     firebase: {
-        page: {
+        /*page: {
             source: db.ref("page"),
             asObject: true
-        }
+        },*/
+        admin: {
+            source: db.ref("administrator"),
+            asObject: true
+        },
+        guest: {
+            source: db.ref("users/guest"),
+            asObject: true
+        },
+        guestHistory: db.ref("users/guest/history")
     },
 
     data() {
@@ -127,6 +143,7 @@ export default {
                 visible: false,
                 text: ""
             },
+            page: "home",
             username: "",
             signedIn: false,
             userOptions: false,
@@ -151,15 +168,41 @@ export default {
                         db.ref("users/" + user.uid).set({
                             name: app.username,
                             email: user.email,
-                            emailVerified: user.emailVerified,
                             bookmarks: [],
-                            history: []
+                            history: [],
+                            page: app.page
                         });
                     }
                 });
                 app.$bindAsObject("user", db.ref("users/" + user.uid));
                 app.$bindAsArray("bookmarks", db.ref("users/" + user.uid + "/bookmarks"));
                 app.$bindAsArray("history", db.ref("users/" + user.uid + "/history"));
+
+                db.ref("users/" + user.uid + "/page").once("value").then(function (snapshot) {
+                    if (snapshot.val()) {
+                        app.page = snapshot.val();
+                    } else {
+                        app.page = "home";
+                    }
+                });
+
+                db.ref("users/" + user.uid + "/currentResults").once("value").then(function (snapshot) {
+                    if (snapshot.val()) {
+                        app.results = snapshot.val();
+                        app.isBookmark = snapshot.val().isBookmark;
+                    } else {
+                        app.resetResults();
+                    }
+                });
+
+                db.ref("users/" + user.uid + "/currentCompare").once("value").then(function (snapshot) {
+                    if (snapshot.val()) {
+                        app.toCompare = snapshot.val();
+                    } else {
+                        app.resetCompare();
+                    }
+                });
+
             } else {
                 app.signedIn = false;
                 app.username = "";
@@ -171,31 +214,40 @@ export default {
             }
         });
 
-        db.ref("currentResults").once("value").then(function (snapshot) {
-            if (snapshot.val()) {
-                app.results = snapshot.val();
-                app.isBookmark = snapshot.val().isBookmark;
-            } else {
-                app.resetResults();
-            }
-        });
-
-        db.ref("currentCompare").once("value").then(function (snapshot) {
-            if (snapshot.val()) {
-                app.toCompare = snapshot.val();
-            } else {
-                app.resetCompare();
-            }
-        });
     },
 
     computed: {
 
         goToAccountPage() {
-            if (this.page['.value'] == "account-bookmarks" || this.page['.value'] == "account-history" || this.page['.value'] == "account-settings") {
+            if (this.page == "account-bookmarks" || this.page == "account-history" || this.page == "account-master-history" || this.page == "account-settings") {
                 return true;
             }
             return false;
+        },
+
+        masterHistory() {
+            var master = [];
+            if (this.signedIn && this.user != null) {
+                if (this.user[".key"] == this.admin[".value"]) {
+                    db.ref("users").once("value").then(function (snapshot) {
+                        var val = snapshot.val();
+                        if (val) {
+                            for (var u in val) {
+                                if (val[u].hasOwnProperty("history")) {
+                                    for (var item in val[u]["history"]) {
+                                        master.push({
+                                            user: val[u]["name"],
+                                            name: val[u]["history"][item]["name"],
+                                            timestamp: val[u]["history"][item]["timestamp"]
+                                        });
+                                    }
+                                }
+                            }
+                        }
+                    });
+                }
+            };
+            return master;
         }
     },
 
@@ -207,12 +259,17 @@ export default {
 
         goTo(newPage) {
 
-            if (this.page['.value'] == "results") {
-                if (confirm("Are you sure you want to leave this page? You will lose the results unless you bookmark them.")) {
+            if (this.page == "results") {
+                if (this.signedIn) {
+                    if (confirm("Are you sure you want to leave this page? You will lose the results unless you bookmark them.")) {
+                        this.setPage(newPage);
+                        this.resetResults();
+                    }
+                } else {
                     this.setPage(newPage);
                     this.resetResults();
                 }
-            } else if (this.page[".value"] == "compare") {
+            } else if (this.page == "compare") {
                 if (confirm("Are you sure you want to leave this page?")) {
                     this.setPage(newPage);
                     this.resetCompare();
@@ -223,10 +280,11 @@ export default {
         },
 
         setPage(newPage) {
-            const copy = this.page;
-            delete copy[".key"];
-            copy[".value"] = newPage;
-            this.$firebaseRefs.page.set(copy);
+            this.page = newPage;
+            if (this.user) {
+
+                db.ref("users/" + this.user[".key"] + "/page").set(this.page);
+            }
         },
 
         displayMessage(text) {
@@ -260,10 +318,6 @@ export default {
                 this.setPage("home");
                 auth.signOut();
             }
-        },
-
-        forgotPassword() {
-
         },
 
         updateProfile(name, email, password) {
@@ -378,8 +432,10 @@ export default {
 
             this.results.id = Date.now(),
                 this.results.query = q;
+                this.searchTweets();
+            //this.results.numTweets = 0;
 
-            /*if (q == "one") {
+           /* if (q == "one") {
                 this.results.tones = this.toneTests[0];
                 this.results.personality = this.personalityTests[0];
             } else if (q == "two") {
@@ -399,24 +455,24 @@ export default {
 
             this.addHistoryItem(this.results);
             this.displayResults();*/
+            /*
+                        if (this.searchTweets()) {
+                            if (this.analyzeTone()) {
+                                if (this.analyzePersonality()) {
+                                    this.addHistoryItem(this.results);
+                                    this.displayResults();
+                                    return;
+                                } else {
+                                    this.displayMessage("Unable to analyze personality.");
+                                }
+                            } else {
+                                this.displayMessage("Unable to analyze tone.");
+                            }
+                        } else {
+                            this.displayMessage("Unable to search Tweets.");
+                        }
 
-            if (this.searchTweets()) {
-                if (this.analyzeTone()) {
-                    if (this.analyzePersonality()) {
-                        this.addHistoryItem(this.results);
-                        this.displayResults();
-                        return;
-                    } else {
-                        this.displayMessage("Unable to analyze personality.");
-                    }
-                } else {
-                    this.displayMessage("Unable to analyze tone.");
-                }
-            } else {
-                this.displayMessage("Unable to search Tweets.");
-            }
-
-            this.resetResults();
+                        this.resetResults();*/
         },
 
         /* ------------------------------
@@ -424,13 +480,19 @@ export default {
          * ------------------------------ */
 
         displayResults() {
-            db.ref("currentResults").set(this.results);
-            db.ref("currentResults/isBookmark").set(this.isBookmark);
+            if (this.user) {
+
+                db.ref("users/" + this.user[".key"] + "/currentResults").set(this.results);
+                db.ref("users/" + this.user[".key"] + "/currentResults/isBookmark").set(this.isBookmark);
+            }
             this.setPage("results");
         },
 
         resetResults() {
-            db.ref("currentResults").remove();
+            if (this.user) {
+
+                db.ref("users/" + this.user[".key"] + "/currentResults").remove();
+            }
             this.submitted = false;
             this.isBookmark = false;
 
@@ -446,7 +508,9 @@ export default {
         },
 
         resetCompare() {
-            db.ref("currentCompare").remove();
+            if (this.user) {
+                db.ref("users/" + this.user[".key"] + "/currentCompare").remove();
+            }
             this.toCompare = [];
         },
 
@@ -459,22 +523,25 @@ export default {
             let save = Object.assign({}, this.results);
             delete save[".key"];
 
-            db.ref("currentResults").set(save);
-            db.ref("currentResults/isBookmark").set(this.isBookmark);
+            db.ref("users/" + this.user[".key"] + "/currentResults").set(save);
+            db.ref("users/" + this.user[".key"] + "/currentResults/isBookmark").set(this.isBookmark);
         },
 
         compareResults(bookmarks) {
             this.toCompare = bookmarks;
             this.submitted = true;
 
-            let save1 = Object.assign({}, this.toCompare[0]);
-            delete save1[".key"];
+            if (this.user) {
 
-            let save2 = Object.assign({}, this.toCompare[1]);
-            delete save2[".key"];
+                let save1 = Object.assign({}, this.toCompare[0]);
+                delete save1[".key"];
 
-            var saveCompare = [save1, save2];
-            db.ref("currentCompare").set(saveCompare);
+                let save2 = Object.assign({}, this.toCompare[1]);
+                delete save2[".key"];
+
+                var saveCompare = [save1, save2];
+                db.ref("users/" + this.user[".key"] + "/currentCompare").set(saveCompare);
+            }
             this.setPage("compare");
         },
 
@@ -483,34 +550,62 @@ export default {
          * ------------------------------ */
 
         searchTweets() {
-
             var app = this;
+            var query = {
+                "query": "#" + app.results.query
+            }
 
-            twitter.get("tweets/search/fullarchive/dev", {
-                query: this.results.query,
-                maxResults: 500
-            }, function (error, data, response) {
+            var requestOptions = {
+                url: "https://" + twitterSearchConfig["url"] + twitterSearchConfig["env"] + ".json",
+                oauth: twitterSearchAuth,
+                json: true,
+                headers: {
+                    "content-type": "application/json"
+                },
+                body: query,
+                withCredentials: false
+            }
+
+
+            request.post(requestOptions, function (error, response, body) {
                 if (error) {
                     console.log(error);
-                    return false;
-                } else {
-                    console.log(data);
-                    var tweets = data.results;
-
-                    app.results.numTweets = tweets.length;
-
-                    for (var i = 0; i < tweets.length; i++) {
-                        app.results.tweets.push(parseTweetObject(tweets[i]));
-                    };
-
-                    return true;
-
-                    // keep id string, text, place, time
-                    // params are query, count 100, include_entities false
+                    return;
                 }
-            });
+                console.log(body);
+            })
 
-            return false;
+            
+
+
+            /*
+                        var app = this;
+
+                        twitter.get("tweets/search/fullarchive/dev", {
+                            query: this.results.query,
+                            maxResults: 500
+                        }, function (error, data, response) {
+                            if (error) {
+                                console.log(error);
+                                return false;
+                            } else {
+                                console.log(data);
+                                var tweets = data.results;
+
+                                app.results.numTweets = tweets.length;
+
+                                for (var i = 0; i < tweets.length; i++) {
+                                    app.results.tweets.push(parseTweetObject(tweets[i]));
+                                };
+
+                                return true;
+
+                                // keep id string, text, place, time
+                                // params are query, count 100, include_entities false
+                            }
+                        });
+
+                        return false;*/
         },
 
         parseTweetObject(tweet) {
@@ -627,15 +722,15 @@ export default {
             var num = this.bookmarks.length;
             this.$firebaseRefs.bookmarks.push(item);
             this.results = this.bookmarks[num];
-            db.ref("currentResults").set(item);
-            db.ref("currentResults/isBookmark").set(this.isBookmark);
+            db.ref("users/" + this.user[".key"] + "/currentResults").set(item);
+            db.ref("users/" + this.user[".key"] + "/currentResults/isBookmark").set(this.isBookmark);
         },
 
         deleteBookmark(item) {
             if (confirm("Are you sure you want to delete this bookmark?")) {
                 this.$firebaseRefs.bookmarks.child(item['.key']).remove();
                 this.isBookmark = false;
-                db.ref("currentResults/isBookmark").set(this.isBookmark);
+                db.ref("users/" + this.user[".key"] + "/currentResults/isBookmark").set(this.isBookmark);
             }
         },
 
@@ -652,10 +747,17 @@ export default {
         addHistoryItem() {
             var app = this;
             var date = new Date(this.results.id);
-            this.$firebaseRefs.history.push({
-                name: app.results.query,
-                timestamp: date.toLocaleString()
-            });
+            if (this.signedIn) {
+                this.$firebaseRefs.history.push({
+                    name: app.results.query,
+                    timestamp: date.toLocaleString()
+                });
+            } else {
+                this.$firebaseRefs.guestHistory.push({
+                    name: app.results.query,
+                    timestamp: date.toLocaleString()
+                });
+            }
         },
 
         deleteHistoryItem(item) {
@@ -667,6 +769,12 @@ export default {
         deleteAllHistory() {
             if (confirm("Are you sure you want to clear your search history?")) {
                 this.$firebaseRefs.history.remove();
+            }
+        },
+
+        deleteGuestHistory() {
+            if (confirm("Are you sure you want to clear the guest search history?")) {
+                this.$firebaseRefs.guestHistory.remove();
             }
         }
 
