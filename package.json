@@ -10,10 +10,12 @@
     "build": "cross-env NODE_ENV=production webpack --progress --hide-modules"
   },
   "dependencies": {
+    "cors-anywhere": "^0.4.1",
     "d3": "^5.5.0",
     "dotenv": "^6.0.0",
     "firebase": "^5.4.0",
     "get-twitter-bearer-token": "^1.0.0",
+    "http-server": "^0.11.1",
     "json-loader": "^0.5.7",
     "material-design-icons-iconfont": "^3.0.3",
     "personality-text-summary": "^2.2.0",
@@ -24,7 +26,8 @@
     "vue": "^2.5.11",
     "vuefire": "^1.4.5",
     "vuetify": "^1.1.13",
-    "watson-developer-cloud": "^3.9.0"
+    "watson-developer-cloud": "^3.9.0",
+    "zlib": "^1.0.5"
   },
   "browserslist": [
     "> 1%",
