@@ -33,20 +33,23 @@ export default {
 
     data() {
         return {
-            infoPanel: false
+            infoPanel: false,
+            currTones: []
         }
     },
 
     computed: {
 
         numTones() {
-            return this.tones.length;
+            return this.currTones.length;
         }
     },
 
     mounted: function () {
 
         var app = this;
+        this.currTones = this.tones;
+
         var height = this.numTones * 30 + (this.numTones - 1) * 15 + 50;
 
         var svg = d3.select("#" + app.chartID + "-chart")
@@ -57,7 +60,7 @@ export default {
             .range([120, 520]);
 
         svg.selectAll(".tone-score")
-            .data(app.tones)
+            .data(app.currTones)
             .enter()
             .append("g")
             .attr("class", "tone-score")

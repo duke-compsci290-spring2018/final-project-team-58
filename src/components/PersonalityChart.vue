@@ -30,7 +30,7 @@
         data () {
             return {
                 infoPanel: false,
-                currTraits: this.traits
+                currTraits: []
             }
         },
 
@@ -49,6 +49,7 @@
                 return a.percentile - b.percentile;
             });*/
 
+            this.currTraits = this.traits;
             this.currTraits.splice(5);
 
             var svg = d3.select("#" + app.chartID)

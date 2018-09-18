@@ -28,7 +28,7 @@
                         <v-icon v-if="bookmarked" color="white" large>bookmark</v-icon>
                     </v-btn>
                     <v-card v-if="!signedIn">
-                    <v-card-text class="body-2">Sign in or create an account to bookmark these results.</v-card-text>
+                        <v-card-text class="body-2">Sign in or create an account to bookmark these results.</v-card-text>
                     </v-card>
 
                 </v-flex>
@@ -38,25 +38,25 @@
     <v-container fluid grid-list-lg>
         <v-layout row wrap>
             <v-flex xs12 md6 d-flex>
-                <tone-chart chartID="tones" :tones="tones" :header="true"></tone-chart>
+                <tone-chart v-if="tones.length > 0" chartID="tones" :tones="tones" :header="true"></tone-chart>
             </v-flex>
             <v-flex xs12 sm6 d-flex>
-                <personality-summary :header="true" :text-summary="summary"></personality-summary>
+                <personality-summary v-if="summary" :header="true" :text-summary="summary"></personality-summary>
             </v-flex>
             <v-flex xs12 sm6 md4 d-flex>
-                <personality-chart chartID="personality" :traits="traits" :header="true"></personality-chart>
+                <personality-chart v-if="traits.length > 0" chartID="personality" :traits="traits" :header="true"></personality-chart>
             </v-flex>
             <v-flex xs12 sm6 md4 d-flex>
-                <personality-chart chartID="needs" :traits="needs" :header="true"></personality-chart>
+                <personality-chart v-if="needs.length > 0" chartID="needs" :traits="needs" :header="true"></personality-chart>
             </v-flex>
             <v-flex xs12 sm6 md4 d-flex>
-                <personality-chart chartID="values" :traits="values" :header="true"></personality-chart>
+                <personality-chart v-if="values.length > 0" chartID="values" :traits="values" :header="true"></personality-chart>
             </v-flex>
             <v-flex xs12 sm6 d-flex>
-                <personality-preferences :likely="true" :behaviors="likelyPrefs" :header="true"></personality-preferences>
+                <personality-preferences v-if="likelyPrefs.length > 0" :likely="true" :behaviors="likelyPrefs" :header="true"></personality-preferences>
             </v-flex>
             <v-flex xs12 sm6 d-flex>
-                <personality-preferences :likely="false" :behaviors="unlikelyPrefs" :header="true"></personality-preferences>
+                <personality-preferences v-if="unlikelyPrefs.length > 0" :likely="false" :behaviors="unlikelyPrefs" :header="true"></personality-preferences>
             </v-flex>
 
         </v-layout>
@@ -65,16 +65,20 @@
 </template>
 
 <script>
+import Vue from "vue"
 import PersonalitySummary from "./PersonalitySummary.vue"
 import PersonalityPreferences from "./PersonalityPreferences.vue"
 import PersonalityChart from "./PersonalityChart.vue"
 import ToneChart from "./ToneChart.vue"
 import ResultsSummary from "./ResultsSummary.vue"
 
- var PersonalityTextSummaries = require('personality-text-summary');
+var PersonalityTextSummaries = require('personality-text-summary');
 
-  // locale is one of {'en', 'es', 'ja', 'ko'}.  version refers to which version of Watson Personality Insights to use, v2 or v3.
-  var v3EnglishTextSummaries = new PersonalityTextSummaries({ locale: 'en', version: 'v3' });
+// locale is one of {'en', 'es', 'ja', 'ko'}.  version refers to which version of Watson Personality Insights to use, v2 or v3.
+var v3EnglishTextSummaries = new PersonalityTextSummaries({
+    locale: 'en',
+    version: 'v3'
+});
 
 export default {
     name: 'Results',
@@ -109,38 +113,70 @@ export default {
         }
     },
 
-    created: function () {
+    /*created: function () {
         if (this.isBookmark) {
-            this.bookmarked = true;
-            this.hashtag = this.results.hashtag;
-            this.timestamp = this.results.timestamp;
-            this.numTweets = this.results.numTweets;
-            this.numWords = this.results.numWords;
-            this.tones = this.results.tones;
-            this.summary = this.results.summary;
-            this.traits = this.results.traits;
-            this.needs = this.results.needs;
-            this.values = this.results.values;
-            this.likelyPrefs = this.results.likelyPrefs;
-            this.unlikelyPrefs = this.results.unlikelyPrefs;
-        } else {
-            var date = new Date(this.results.id);
-            this.hashtag = this.results.query;
-            this.timestamp = date.toLocaleString();
-            this.numTweets = this.results.numTweets;
-            this.numWords = this.results.personality["word_count"];
-            this.tones = this.results.tones["document_tone"]["tones"];
-            this.summary = v3EnglishTextSummaries.getSummary(this.results.personality);
-            this.traits = this.results.personality["personality"];
-            this.needs = this.results.personality["needs"];
-            this.values = this.results.personality["values"];
-            this.prefs = this.results.personality["consumption_preferences"];
+            this.setData();
+            console.log("yay");
+        }
+    },*/
 
-            this.sortPreferences();
+    created: function () {
+        this.setData();
+    },
+
+    computed: {
+        likelyPrefsShort () {
+            return this.likelyPrefs.splice(5);
+        },
+
+        unlikelyPrefsShort() {
+            return this.unlikelyPrefs.splice(5);
         }
     },
 
     methods: {
+
+        setData() {
+
+            this.numTweets = this.results.numTweets;
+            this.numWords = this.results.numWords;
+            Vue.set(this.tones, this.results.tones);
+            //this.tones = this.results.tones;
+
+            if (this.isBookmark) {
+                this.bookmarked = true;
+                this.hashtag = this.results.hashtag;
+                this.timestamp = this.results.timestamp;
+                this.summary = this.results.summary;
+                Vue.set(this.traits, this.results.traits);
+                //this.traits = this.results.traits;
+                //this.needs = this.results.needs;
+                Vue.set(this.needs, this.results.needs);
+                //this.values = this.results.values;
+                Vue.set(this.values, this.results.values);
+                //this.likelyPrefs = this.results.likelyPrefs;
+                Vue.set(this.likelyPrefs, this.results.likelyPrefs);
+                //this.unlikelyPrefs = this.results.unlikelyPrefs;
+                Vue.set(this.unlikelyPrefs, this.results.unlikelyPrefs);
+            } else {
+                var date = new Date(this.results.id);
+                this.hashtag = this.results.query;
+                this.timestamp = date.toLocaleString();
+                this.summary = v3EnglishTextSummaries.getSummary(this.results.personality);
+                Vue.set(this.traits, this.results.personality["personality"]);
+                //this.traits = this.results.personality["personality"];
+                //this.needs = this.results.personality["needs"];
+                Vue.set(this.needs, this.results.personality["needs"]);
+                //this.values = this.results.personality["values"];
+                Vue.set(this.values, this.results.personality["values"]);
+                //this.prefs = this.results.personality["consumption_preferences"];
+                Vue.set(this.prefs, this.results.personality["consumption_preferences"]);
+
+                this.sortPreferences();
+            }
+
+        },
+
         sortPreferences() {
             for (var i = 0; i < this.prefs.length; i++) {
                 if (this.prefs[i].hasOwnProperty("consumption_preferences")) {

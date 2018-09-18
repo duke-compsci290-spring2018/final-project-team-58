@@ -112,6 +112,10 @@ import p4 from "./assets/data/personality-test-4.json"
 
 import tweets from "./assets/data/tweets"
 
+import {
+    API_URL
+} from './config'
+
 export default {
     name: 'App',
     components: {
@@ -152,6 +156,7 @@ export default {
             searchQuery: "",
             submitted: false,
             results: {},
+            foundTweets: false,
             isBookmark: false,
             toCompare: [],
             toneTests: [t1, t2, t3, t4],
@@ -621,6 +626,15 @@ export default {
 
     computed: {
 
+        checkResults() {
+            console.log("checking results");
+            var r = this.results;
+            if (r.numTweets > 0 && r.numWords > 0 && r.query && r.tweets.length > 0 && r.tones.length > 0 && r.personality != null) {
+                return Promise.resolve(r);
+            }
+            return Promise.reject("Results aren't complete.");
+        },
+
         goToAccountPage() {
             if (this.page == "account-bookmarks" || this.page == "account-history" || this.page == "account-master-history" || this.page == "account-settings") {
                 return true;
@@ -831,10 +845,32 @@ export default {
 
         submitSearch(q) {
 
-            this.submitted = true;
+            var app = this;
 
             this.results.id = Date.now(),
-                this.results.query = q;
+            this.results.query = q;
+
+            var submittingSearch = new Promise(function(resolve, reject) {
+                resolve();
+            });
+            
+            submittingSearch
+            .then(app.searchTweets)
+            .then(app.createToneText)
+            .then(toneText => app.analyzeTone(toneText))
+            .then(app.createPersonalityText)
+            .then(personalityText => app.analyzePersonality(personalityText))
+            .then(app.checkResults)
+            .then (function () {
+                this.addHistoryItem(this.results);
+                this.displayResults();
+                return;
+            }).catch(error => {
+                console.log(error);
+                //app.resetResults();
+            });
+            
+
             //this.searchTweets();
             //this.results.numTweets = 0;
 
@@ -859,14 +895,14 @@ export default {
              this.addHistoryItem(this.results);
              this.displayResults();*/
 
-            this.results.tweets = this.testingTweets;
+            //this.results.tweets = this.testingTweets;
 
             //this.searchTweets();
-            if (this.results.tweets) {
-                //var toneText = this.createToneText();
-                //if (toneText) {
-                    //this.analyzeTone(toneText);
-                    //if (this.results.tones) {
+            /*if (this.results.tweets) {
+                var toneText = this.createToneText();
+                if (toneText) {
+                    this.analyzeTone(toneText);
+                    if (this.results.tones) {
                         var personalityText = this.createPersonalityText();
                         if (personalityText.contentItems.length) {
                             this.analyzePersonality(personalityText);
@@ -882,21 +918,59 @@ export default {
                             console.log("couldn't make personality content");
                             this.displayMessage("Unable to analyze personality.");
                         }
-                    //} else {
-                        /*console.log("no tones");
+                    } else {
+                        console.log("no tones");
                         this.displayMessage("Unable to analyze tone.");
                     }
                 } else {
                     console.log("couldn't make tone text");
                     this.displayMessage("Unable to analyze tone.");
-                }*/
+                }
+
+            } else {
+                console.log("no tweets in results");
+                this.displayMessage("Unable to search Tweets.");
+            }*/
+
+            //this.resetResults();
+        },
+
+        analyzeSearch() {
+            if (this.results.tweets) {
+                var toneText = this.createToneText();
+                if (toneText) {
+                    this.analyzeTone(toneText);
+                    if (this.results.tones) {
+                        var personalityText = this.createPersonalityText();
+                        if (personalityText.contentItems.length) {
+                            this.analyzePersonality(personalityText);
+                            if (this.results.personality) {
+                                if (this.checkResults) {
+                                    this.addHistoryItem(this.results);
+                                    this.displayResults();
+                                    return;
+                                }
+                            } else {
+                                console.log("no personality profile");
+                                this.displayMessage("Unable to analyze personality.");
+                            }
+                        } else {
+                            console.log("couldn't make personality content");
+                            this.displayMessage("Unable to analyze personality.");
+                        }
+                    } else {
+                        console.log("no tones");
+                        this.displayMessage("Unable to analyze tone.");
+                    }
+                } else {
+                    console.log("couldn't make tone text");
+                    this.displayMessage("Unable to analyze tone.");
+                }
 
             } else {
                 console.log("no tweets in results");
                 this.displayMessage("Unable to search Tweets.");
             }
-
-            //this.resetResults();
         },
 
         /* ------------------------------
@@ -926,7 +1000,7 @@ export default {
                 numTweets: 0,
                 numWords: 0,
                 tweets: [],
-                tones: {},
+                tones: [],
                 personality: {}
             }
         },
@@ -974,61 +1048,100 @@ export default {
          * ------------------------------ */
 
         searchTweets() {
+
+            console.log("searching tweets");
+
             var app = this;
+
             var query = {
                 "query": "#" + app.results.query
             }
 
-            var key = "v88r6lWdrpiiYFrcYVZtwN4gx";
-            var secret = "nvbKZnwuOpBajOKjGIJtBKfhtGOpdlp8GLNO46HoqIFIWvLCT7";
-            var cat = key + ":" + secret;
-            var credentials = new Buffer(cat).toString('base64');
+            console.log(query);
 
-            request({
-                url: "https://cors-anywhere.herokuapp.com/" + 'https://api.twitter.com/oauth2/token',
-                method: 'POST',
-                headers: {
-                    "Authorization": "Basic " + credentials,
-                    "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8"
-                },
-                body: "grant_type=client_credentials"
-
-            }, function (err, resp, body) {
-
-                if (err) {
-                    console.log(err);
-                    return;
-                }
-
-                console.dir(body); //the bearer token...
-                var tokenData = JSON.parse(body);
-                var token = tokenData.access_token;
-
-                request.post({
-                    url: "https://cors-anywhere.herokuapp.com/" + "https://" + twitterSearchConfig["url"] + twitterSearchConfig["env"] + ".json",
+            fetch(`${API_URL}/tweets`, {
+                    method: 'POST',
+                    body: JSON.stringify(query),
                     headers: {
-                        "Authorization": "Bearer " + token,
-                        "Content-Type": 'application/json'
-                    },
-                    body: query,
-                    json: true
-                }, function (e, r, body) {
-                    if (e) {
-                        console.log(e);
-                        return false;
+                        "Content-Type": "application/json"
                     }
-                    console.log(body);
+                }).then(response => response.json())
+                .then(data => {
+                    console.log(data);
 
-                    var tweets = body.results;
-
+                    var tweets = data.results;
                     app.results.numTweets = tweets.length;
 
                     for (var i = 0; i < tweets.length; i++) {
                         app.results.tweets.push(app.parseTweetObject(tweets[i]));
                     };
-                })
 
-            });
+                    console.log(app.results.tweets);
+
+                    
+
+                }).then(function() {
+                    return Promise.resolve(app.results.tweets);
+                })
+                .catch(error => {
+                    console.log(error);
+                    return Promise.reject(error);
+                });
+            /*
+                        var query = {
+                            "query": "#" + app.results.query
+                        }
+
+                        var key = "v88r6lWdrpiiYFrcYVZtwN4gx";
+                        var secret = "nvbKZnwuOpBajOKjGIJtBKfhtGOpdlp8GLNO46HoqIFIWvLCT7";
+                        var cat = key + ":" + secret;
+                        var credentials = new Buffer(cat).toString('base64');
+
+                        request({
+                            url: "${ API_URL }" + 'https://api.twitter.com/oauth2/token',
+                            method: 'POST',
+                            headers: {
+                                "Authorization": "Basic " + credentials,
+                                "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8"
+                            },
+                            body: "grant_type=client_credentials"
+
+                        }, function (err, resp, body) {
+
+                            if (err) {
+                                console.log(err);
+                                return;
+                            }
+
+                            console.dir(body); //the bearer token...
+                            var tokenData = JSON.parse(body);
+                            var token = tokenData.access_token;
+
+                            request.post({
+                                url: "${ API_URL }" + "https://" + twitterSearchConfig["url"] + twitterSearchConfig["env"] + ".json",
+                                headers: {
+                                    "Authorization": "Bearer " + token,
+                                    "Content-Type": 'application/json'
+                                },
+                                body: query,
+                                json: true
+                            }, function (e, r, body) {
+                                if (e) {
+                                    console.log(e);
+                                    return false;
+                                }
+                                console.log(body);
+
+                                var tweets = body.results;
+
+                                app.results.numTweets = tweets.length;
+
+                                for (var i = 0; i < tweets.length; i++) {
+                                    app.results.tweets.push(app.parseTweetObject(tweets[i]));
+                                };
+                            })
+
+                        });*/
         },
 
         parseTweetObject(tweet) {
@@ -1047,47 +1160,88 @@ export default {
          * ------------------------------ */
 
         createToneText() {
+
+            console.log("creating tone text");
             var text = "";
 
             for (var i = 0; i < this.results.tweets.length; i++) {
                 text += ". " + this.results.tweets[i].text;
             }
 
-            return text;
+            console.log(text);
+            if (text) {
+                return Promise.resolve(text);
+            } else {
+                return Promise.reject("Could not create tone text.")
+            }
+            
         },
 
         analyzeTone(text) {
+
+            console.log("analyzing tone");
+
             var app = this;
 
-            var toneParams = {
-                tone_input: {
-                    text: text
-                },
-                content_type: "application/json",
-                sentences: false
+            var tone_input = {
+                text: text
             };
 
-            toneAnalyzer.tone(toneParams, function (error, toneAnalysis) {
-                if (error) {
-                    console.log(error);
-                    return;
-                } else {
-                    console.log(toneAnalysis);
-                    app.results.tones = [];
-
-                    for (var i = 0; i < toneAnalysis.document_tone.tone_categories.length; i++) {
-                        for (var j = 0; j < toneAnalysis.document_tone.tone_categories[i].tones.length; j++) {
-                            app.results.tones.push(toneAnalysis.document_tone.tone_categories[i].tones[j])
-                        }
+            fetch(`${API_URL}/tones`, {
+                    method: 'POST',
+                    body: JSON.stringify(tone_input),
+                    headers: {
+                        "Content-Type": "application/json"
                     }
-                }
-            });
+                }).then(response => response.json())
+                .then(data => {
+                    console.log(data);
+                    app.results.tones = data.document_tone.tones;
+                    /*app.results.tones = [];
 
-            if (this.results.tones) {
-                return true;
-            } else {
-                return false;
-            }
+                    for (var i = 0; i < data.document_tone.tone_categories.length; i++) {
+                        for (var j = 0; j < data.document_tone.tone_categories[i].tones.length; j++) {
+                            app.results.tones.push(data.document_tone.tone_categories[i].tones[j])
+                        }
+                    }*/
+                    
+                }).then(function() {return Promise.resolve(app.results.tones);})
+                .catch(error => {
+                    console.log(error);
+                    return Promise.reject(error)
+                });
+
+
+            /*
+                        var toneParams = {
+                            tone_input: {
+                                text: text
+                            },
+                            content_type: "application/json",
+                            sentences: false
+                        };
+
+                        toneAnalyzer.tone(toneParams, function (error, toneAnalysis) {
+                            if (error) {
+                                console.log(error);
+                                return;
+                            } else {
+                                console.log(toneAnalysis);
+                                app.results.tones = [];
+
+                                for (var i = 0; i < toneAnalysis.document_tone.tone_categories.length; i++) {
+                                    for (var j = 0; j < toneAnalysis.document_tone.tone_categories[i].tones.length; j++) {
+                                        app.results.tones.push(toneAnalysis.document_tone.tone_categories[i].tones[j])
+                                    }
+                                }
+                            }
+                        });
+
+                        if (this.results.tones) {
+                            return true;
+                        } else {
+                            return false;
+                        }*/
         },
 
         /* ------------------------------
@@ -1095,6 +1249,8 @@ export default {
          * ------------------------------ */
 
         createPersonalityText() {
+
+            console.log("creating personality text");
 
             var app = this;
 
@@ -1114,39 +1270,65 @@ export default {
                 content.contentItems.push(item);
             }
             this.profileInput = content;
-            return content;
+            console.log(content);
 
+            if (content) {
+                return Promise.resolve(content);
+            } else {
+                return Promise.reject("Could not create personality text.")
+            }
+            
         },
 
         analyzePersonality(content) {
+
+            console.log("analyzing personality");
             var app = this;
+            /*
+                        var personalityParams = {
+                            content: content,
+                            content_type: "application/json",
+                            consumption_preferences: true
+                        };
 
-            var personalityParams = {
-                content: content,
-                content_type: "application/json",
-                consumption_preferences: true
-            };
+                        personalityInsights.profile(
+                            
+                                personalityParams
+                            ,
+                            function (error, profile) {
+                                if (error) {
+                                    console.log(error);
+                                    
+                                } 
+                                    console.log("yeet");
+                                    console.log(profile);
+                                    app.results.personality = profile;
+                                
+                            });
+            */
 
-            personalityInsights.profile(
-                
-                    personalityParams
-                ,
-                function (error, result, response) {
-                    if (error) {
-                        console.log(error);
-                        
-                    } 
-                        console.log("yeet");
-                        console.log(result);
-                        //app.results.personality = response;
+            fetch(`${API_URL}/personality`, {
+                    method: 'POST',
+                    body: JSON.stringify(content),
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Accept": "application/json"
+                    }
+                }).then(response => response.json())
+                .then(data => {
+                    console.log(data);
+                    app.results.personality = data;
+                    app.results.numWords = data.word_count;
                     
+                }).then(function() {
+                    return Promise.resolve(app.results.personality);
+                })
+                .catch(error => {
+                    console.log(error);
+                    return Promise.reject(error);
                 });
 
-            if (this.results.personality) {
-                return true;
-            } else {
-                return false;
-            }
+
         },
 
         /* ------------------------------
