@@ -1,5 +1,5 @@
 <template>
-<v-container class="mb-3">
+<v-container class="mb-3" fluid>
    <v-jumbotron height="250px">
         <v-container fill-height>
             <v-layout row align-center justify-center>

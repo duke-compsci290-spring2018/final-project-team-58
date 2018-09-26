@@ -1,5 +1,5 @@
 <template>
-<v-container class="mb-3">
+<v-container class="mb-3" fluid>
     <v-jumbotron>
         <v-container fill-height>
             <v-layout row wrap align-center justify-center>
@@ -46,10 +46,10 @@
     </v-jumbotron>
     <v-container fluid grid-list-lg>
         <v-layout row wrap>
-            <v-flex xs12 md6 d-flex>
+            <v-flex xs12 xl6 d-flex>
                 <tone-chart v-cloak chartID="tones" :tones="tones" :header="true"></tone-chart>
             </v-flex>
-            <v-flex xs12 sm6 d-flex>
+            <v-flex xs12 sm6 md12 xl6 d-flex>
                 <personality-summary v-cloak :header="true" :text-summary="summary"></personality-summary>
             </v-flex>
             <v-flex xs12 sm6 md4 d-flex>

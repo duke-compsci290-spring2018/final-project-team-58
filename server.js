@@ -19,8 +19,8 @@ app.use(BodyParser.json())
 // list of URLs (and their protocols) that this server responds to
 
 
-import WatsonAPI from "./services/watsonAI.js"
-import Twitter from "./services/yeet.js"
+import WatsonAPI from "./src/services/watsonAI.js"
+import Twitter from "./src/services/yeet.js"
 
 app.post("/tweets", Twitter.searchTweets);
 app.post("/tones", WatsonAPI.analyzeTone);

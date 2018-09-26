@@ -3,7 +3,7 @@
     <v-layout align-start justify-center>
         <v-flex xs12>
             <v-card>
-                <v-toolbar card color="purple darken-4">
+                <v-toolbar card dense color="purple darken-4">
                     <v-toolbar-title class="white--text">Hello, {{ user.name }}!</v-toolbar-title>
                     <v-spacer></v-spacer>
                     <v-toolbar-items>
