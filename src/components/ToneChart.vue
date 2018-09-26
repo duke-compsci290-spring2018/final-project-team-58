@@ -10,7 +10,9 @@
     <v-container>
         <v-expansion-panel class="info-panel">
             <v-expansion-panel-content v-model="infoPanel">
-                <v-card-text>yooo</v-card-text>
+                <v-card-text class="caption">
+                    <p>The tone analysis was obtained using <span class="font-weight-bold">IBM Watson's Tone Analyzer.</span> Seven tones are analyzed: anger, fear, joy, sadness, analytical, confident, and tentative. A tone whose score is less than 0.5 is omitted, indicating that the emotion is unlikely to be perceived in the content. A score greater than 0.75 indicates a high likelihood that the tone is perceived. To read more about the tones and what they mean, check out the <a href="https://console.bluemix.net/docs/services/tone-analyzer/using-tone.html#using-the-general-purpose-endpoint" target="_blank">documentation</a>.</p>
+                </v-card-text>
             </v-expansion-panel-content>
         </v-expansion-panel>
         <div class="chart-container">

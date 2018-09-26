@@ -1,5 +1,5 @@
 <template>
-<v-container>
+<v-container class="mb-3">
    <v-jumbotron height="250px">
         <v-container fill-height>
             <v-layout row align-center justify-center>
@@ -54,10 +54,10 @@
                 <h2 class="display-1 font-weight-light mb-3 white--text">Tones Analysis</h2>
             </v-flex>
             <v-flex xs12 md6 d-flex>
-                <tone-chart chartID="tones-A" :tones="resultsA.tones" :header="false"></tone-chart>
+                <tone-chart v-cloak chartID="tones-A" :tones="resultsA.tones" :header="false"></tone-chart>
             </v-flex>
             <v-flex xs12 md6 d-flex>
-                <tone-chart chartID="tones-B" :tones="resultsB.tones" :header="false"></tone-chart>
+                <tone-chart v-cloak chartID="tones-B" :tones="resultsB.tones" :header="false"></tone-chart>
             </v-flex>
         </v-layout>
 
@@ -66,10 +66,10 @@
                 <h2 class="display-1 font-weight-light mb-3 white--text">Personality Summary</h2>
             </v-flex>
             <v-flex xs12 sm6 d-flex>
-                <personality-summary :header="false" :text-summary="resultsA.summary"></personality-summary>
+                <personality-summary v-cloak :header="false" :text-summary="resultsA.summary"></personality-summary>
             </v-flex>
             <v-flex xs12 sm6 d-flex>
-                <personality-summary :header="false" :text-summary="resultsB.summary"></personality-summary>
+                <personality-summary v-cloak :header="false" :text-summary="resultsB.summary"></personality-summary>
             </v-flex>
         </v-layout>
 
@@ -78,10 +78,10 @@
                 <h2 class="display-1 font-weight-light mb-3 white--text">Personality</h2>
             </v-flex>
             <v-flex xs12 sm6 d-flex>
-                <personality-chart chartID="personality-A" :traits="resultsA.traits" :header="false"></personality-chart>
+                <personality-chart v-cloak chartID="personality-A" :traits="resultsA.traits" :header="false"></personality-chart>
             </v-flex>
             <v-flex xs12 sm6 d-flex>
-                <personality-chart chartID="personality-B" :traits="resultsB.traits" :header="false"></personality-chart>
+                <personality-chart v-cloak chartID="personality-B" :traits="resultsB.traits" :header="false"></personality-chart>
             </v-flex>
         </v-layout>
 
@@ -90,10 +90,10 @@
                 <h2 class="display-1 font-weight-light mb-3 white--text">Needs</h2>
             </v-flex>
             <v-flex xs12 sm6 d-flex>
-                <personality-chart chartID="needs-A" :traits="resultsA.needs" :header="false"></personality-chart>
+                <personality-chart v-cloak chartID="needs-A" :traits="resultsA.needs" :header="false"></personality-chart>
             </v-flex>
             <v-flex xs12 sm6 d-flex>
-                <personality-chart chartID="needs-B" :traits="resultsB.needs" :header="false"></personality-chart>
+                <personality-chart v-cloak chartID="needs-B" :traits="resultsB.needs" :header="false"></personality-chart>
             </v-flex>
         </v-layout>
 
@@ -102,10 +102,10 @@
                 <h2 class="display-1 font-weight-light mb-3 white--text">Values</h2>
             </v-flex>
             <v-flex xs12 sm6 d-flex>
-                <personality-chart chartID="values-A" :traits="resultsA.values" :header="false"></personality-chart>
+                <personality-chart v-cloak chartID="values-A" :traits="resultsA.values" :header="false"></personality-chart>
             </v-flex>
             <v-flex xs12 sm6 d-flex>
-                <personality-chart chartID="values-B" :traits="resultsB.values" :header="false"></personality-chart>
+                <personality-chart v-cloak chartID="values-B" :traits="resultsB.values" :header="false"></personality-chart>
             </v-flex>
         </v-layout>
 
@@ -114,10 +114,10 @@
                 <h2 class="display-1 font-weight-light mb-3 white--text">Users are likely to...</h2>
             </v-flex>
             <v-flex xs12 sm6 d-flex>
-                <personality-preferences :likely="true" :behaviors="resultsA.likelyPrefs" :header="false"></personality-preferences>
+                <personality-preferences v-cloak :likely="true" :behaviors="resultsA.likelyPrefs" :header="false"></personality-preferences>
             </v-flex>
             <v-flex xs12 sm6 d-flex>
-                <personality-preferences :likely="true" :behaviors="resultsB.likelyPrefs" :header="false"></personality-preferences>
+                <personality-preferences v-cloak :likely="true" :behaviors="resultsB.likelyPrefs" :header="false"></personality-preferences>
             </v-flex>
         </v-layout>
 
@@ -126,10 +126,10 @@
                 <h2 class="display-1 font-weight-light mb-3 white--text">Users are unlikely to...</h2>
             </v-flex>
             <v-flex xs12 sm6 d-flex>
-                <personality-preferences :likely="false" :behaviors="resultsA.unlikelyPrefs" :header="false"></personality-preferences>
+                <personality-preferences v-cloak :likely="false" :behaviors="resultsA.unlikelyPrefs" :header="false"></personality-preferences>
             </v-flex>
             <v-flex xs12 sm6 d-flex>
-                <personality-preferences :likely="false" :behaviors="resultsB.unlikelyPrefs" :header="false"></personality-preferences>
+                <personality-preferences v-cloak :likely="false" :behaviors="resultsB.unlikelyPrefs" :header="false"></personality-preferences>
             </v-flex>
         </v-layout>
 

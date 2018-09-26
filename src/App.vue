@@ -47,10 +47,18 @@
 
         <v-content>
             <search v-if="page == 'home'" :submit-search="submitSearch" :display-message="displayMessage"></search>
-            <results v-if="page == 'results'" :results="results" :is-bookmark="isBookmark" :bookmark-save="updateBookmark" :signed-in="signedIn"></results>
-            <compare v-if="page == 'compare'" :search-a="toCompare[0]" :search-b="toCompare[1]"></compare>
+            <results v-cloak v-if="page == 'results'" :results="results" :is-bookmark="isBookmark" :bookmark-save="updateBookmark" :signed-in="signedIn" :download-j-s-o-n="exportData"></results>
+            <compare v-cloak v-if="page == 'compare'" :search-a="toCompare[0]" :search-b="toCompare[1]"></compare>
             <account-settings v-if="goToAccountPage" :user="user" :curr-tab="page" :view-bookmark="viewBookmark" :compare-bookmarks="compareResults" :delete-bookmark="deleteBookmark" :delete-all-bookmarks="deleteAllBookmarks" :delete-history-item="deleteHistoryItem" :delete-all-history="deleteAllHistory" :update-profile="updateProfile" :update-password="updatePassword" :delete-account="deleteAccount" :set-page="setPage" :master-history="masterHistory" :delete-guest-history="deleteGuestHistory" :admin="admin['.value']"></account-settings>
         </v-content>
+        <v-dialog v-model="loading" hide-overlay persistent width="300" lazy>
+            <v-card color="purple darken-4" dark>
+                <v-card-text>
+                    Searching Twitter for #{{ results.query }}...
+                    <v-progress-linear indeterminate color="white" class="mb-0"></v-progress-linear>
+                </v-card-text>
+            </v-card>
+        </v-dialog>
         <!--<v-footer dark height="auto">
             <v-card flat tile class="indigo lighten-1 white--text text-xs-center">
                 <v-card-text>
@@ -70,6 +78,18 @@
                 </v-card-text>
             </v-card>
         </v-footer>-->
+        <v-footer absolute color="transparent">
+            <v-layout justify-space-between align-center row wrap white--text class="px-3">
+                <v-flex xs6 sm3 text-xs-center text-sm-left>
+                    <v-btn dark flat small class="ma-0 caption text-uppercase font-weight-bold spaced-letters" @click="infoDialog = true">What is this about?</v-btn>
+                </v-flex>
+                <v-flex xs6 sm3 text-xs-center text-sm-right class="caption text-uppercase font-weight-bold spaced-letters">
+                    &copy; 2018 Alina Walling</v-flex>
+            </v-layout>
+        </v-footer>
+        <v-dialog v-model="infoDialog" scrollable max-width="700px">
+            <info-dialog :close-dialog="closeInfoDialog"></info-dialog>
+        </v-dialog>
     </v-app>
 </div>
 </template>
@@ -99,6 +119,7 @@ import Results from "./components/Results.vue"
 import LoginForm from "./components/LoginForm.vue"
 import AccountSettings from "./components/AccountSettings.vue"
 import Compare from "./components/Compare.vue"
+import InfoDialog from "./components/InfoDialog.vue"
 
 import t1 from "./assets/data/tone-test-1.json"
 import t2 from "./assets/data/tone-test-2.json"
@@ -123,7 +144,8 @@ export default {
         Results,
         LoginForm,
         AccountSettings,
-        Compare
+        Compare,
+        InfoDialog
     },
 
     firebase: {
@@ -153,8 +175,9 @@ export default {
             signedIn: false,
             userOptions: false,
             loginDialog: false,
+            infoDialog: false,
             searchQuery: "",
-            submitted: false,
+            loading: false,
             results: {},
             foundTweets: false,
             isBookmark: false,
@@ -630,9 +653,11 @@ export default {
             console.log("checking results");
             var r = this.results;
             if (r.numTweets > 0 && r.numWords > 0 && r.query && r.tweets.length > 0 && r.tones.length > 0 && r.personality != null) {
-                return Promise.resolve(r);
+                console.log("results good");
+                return true;
             }
-            return Promise.reject("Results aren't complete.");
+            console.log("resuls good");
+            return false;
         },
 
         goToAccountPage() {
@@ -666,6 +691,17 @@ export default {
             };
             return master;
         }
+    },
+
+    watch: {
+        checkResults() {
+            if (this.checkResults && this.page != "results") {
+                console.log("results were checked");
+                this.addHistoryItem(this.results);
+                this.displayResults();
+            }
+        }
+
     },
 
     methods: {
@@ -848,30 +884,31 @@ export default {
             var app = this;
 
             this.results.id = Date.now(),
-            this.results.query = q;
-
-            var submittingSearch = new Promise(function(resolve, reject) {
-                resolve();
-            });
-            
-            submittingSearch
-            .then(app.searchTweets)
-            .then(app.createToneText)
-            .then(toneText => app.analyzeTone(toneText))
-            .then(app.createPersonalityText)
-            .then(personalityText => app.analyzePersonality(personalityText))
-            .then(app.checkResults)
-            .then (function () {
-                this.addHistoryItem(this.results);
-                this.displayResults();
-                return;
-            }).catch(error => {
-                console.log(error);
-                //app.resetResults();
-            });
-            
-
-            //this.searchTweets();
+                this.results.query = q;
+                this.loading = true;
+            /*
+                        var submittingSearch = new Promise(function(resolve, reject) {
+                            resolve();
+                        });
+                        
+                        submittingSearch
+                        .then(app.searchTweets)
+                        .then(app.createToneText)
+                        .then(toneText => app.analyzeTone(toneText))
+                        .then(app.createPersonalityText)
+                        .then(personalityText => app.analyzePersonality(personalityText))
+                        .then(app.checkResults)
+                        .then (function () {
+                            this.addHistoryItem(this.results);
+                            this.displayResults();
+                            return;
+                        }).catch(error => {
+                            console.log(error);
+                            //app.resetResults();
+                        });
+                        
+            */
+            this.searchTweets();
             //this.results.numTweets = 0;
 
             /* if (q == "one") {
@@ -945,11 +982,14 @@ export default {
                         if (personalityText.contentItems.length) {
                             this.analyzePersonality(personalityText);
                             if (this.results.personality) {
-                                if (this.checkResults) {
+                                console.log("everything worked");
+                                /*if (this.checkResults) {
+                                    console.log("results were checked");
                                     this.addHistoryItem(this.results);
                                     this.displayResults();
                                     return;
-                                }
+                                }*/
+                                return;
                             } else {
                                 console.log("no personality profile");
                                 this.displayMessage("Unable to analyze personality.");
@@ -971,6 +1011,8 @@ export default {
                 console.log("no tweets in results");
                 this.displayMessage("Unable to search Tweets.");
             }
+
+            this.loading = false;
         },
 
         /* ------------------------------
@@ -979,10 +1021,10 @@ export default {
 
         displayResults() {
             if (this.user) {
-
                 db.ref("users/" + this.user[".key"] + "/currentResults").set(this.results);
                 db.ref("users/" + this.user[".key"] + "/currentResults/isBookmark").set(this.isBookmark);
             }
+            this.loading = false;
             this.setPage("results");
         },
 
@@ -991,7 +1033,6 @@ export default {
 
                 db.ref("users/" + this.user[".key"] + "/currentResults").remove();
             }
-            this.submitted = false;
             this.isBookmark = false;
 
             this.results = {
@@ -1015,7 +1056,6 @@ export default {
         viewBookmark(item) {
             this.results = item;
             this.isBookmark = true;
-            this.submitted = true;
             this.setPage("results");
 
             let save = Object.assign({}, this.results);
@@ -1027,7 +1067,6 @@ export default {
 
         compareResults(bookmarks) {
             this.toCompare = bookmarks;
-            this.submitted = true;
 
             if (this.user) {
 
@@ -1077,15 +1116,16 @@ export default {
                     };
 
                     console.log(app.results.tweets);
+                    app.analyzeSearch();
 
-                    
-
-                }).then(function() {
-                    return Promise.resolve(app.results.tweets);
                 })
+
+                /*.then(function() {
+                    return Promise.resolve(app.results.tweets);
+                })*/
                 .catch(error => {
                     console.log(error);
-                    return Promise.reject(error);
+                    //return Promise.reject(error);
                 });
             /*
                         var query = {
@@ -1169,12 +1209,13 @@ export default {
             }
 
             console.log(text);
-            if (text) {
+            return text;
+            /*if (text) {
                 return Promise.resolve(text);
             } else {
                 return Promise.reject("Could not create tone text.")
-            }
-            
+            }*/
+
         },
 
         analyzeTone(text) {
@@ -1204,13 +1245,13 @@ export default {
                             app.results.tones.push(data.document_tone.tone_categories[i].tones[j])
                         }
                     }*/
-                    
-                }).then(function() {return Promise.resolve(app.results.tones);})
+
+                })
+                /*.then(function() {return Promise.resolve(app.results.tones);})*/
                 .catch(error => {
                     console.log(error);
-                    return Promise.reject(error)
+                    //return Promise.reject(error)
                 });
-
 
             /*
                         var toneParams = {
@@ -1271,13 +1312,14 @@ export default {
             }
             this.profileInput = content;
             console.log(content);
+            return content;
 
-            if (content) {
-                return Promise.resolve(content);
-            } else {
-                return Promise.reject("Could not create personality text.")
-            }
-            
+            /* if (content) {
+                 return Promise.resolve(content);
+             } else {
+                 return Promise.reject("Could not create personality text.")
+             }*/
+
         },
 
         analyzePersonality(content) {
@@ -1319,15 +1361,16 @@ export default {
                     console.log(data);
                     app.results.personality = data;
                     app.results.numWords = data.word_count;
-                    
-                }).then(function() {
-                    return Promise.resolve(app.results.personality);
+
                 })
+
+                /*.then(function() {
+                    return Promise.resolve(app.results.personality);
+                })*/
                 .catch(error => {
                     console.log(error);
-                    return Promise.reject(error);
+                    //return Promise.reject(error);
                 });
-
 
         },
 
@@ -1402,7 +1445,17 @@ export default {
             if (confirm("Are you sure you want to clear the guest search history?")) {
                 this.$firebaseRefs.guestHistory.remove();
             }
-        }
+        },
+
+        closeInfoDialog() {
+            this.infoDialog = false;
+        },
+
+        exportData() {
+            var app = this;
+             var myWindow = window.open("/data" , "Results JSON");
+             myWindow.document.write(JSON.stringify(app.results));
+         }
 
     }
 }
@@ -1416,5 +1469,20 @@ export default {
     /* Chrome 10-25, Safari 5.1-6 */
     background: linear-gradient(to top, #FFAF7B, #D76D77, #3A1C71);
     /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+}
+
+[v-cloak] {
+    display: none;
+}
+
+a {
+    text-decoration: none;
+    font-weight: 700;
+    color: #8E24AA !important;
+    transition: 1s;
+}
+
+a:hover {
+    color: #F06292 !important;
 }
 </style>

@@ -10,11 +10,18 @@
     <v-container>
         <v-expansion-panel class="info-panel">
             <v-expansion-panel-content v-model="infoPanel">
-                <v-card-text>yooo</v-card-text>
+                <v-card-text class="caption">
+                    <p>The personality traits were obtained using <span class="font-weight-bold">IBM Watson's Personality Insights.</span> 
+                    "The service groups the more than 40 consumption preferences into eight high-level categories. The preferences indicate the author's likelihood to prefer different products, services, and activities."
+                    <span v-show="likely">This list compiles the consumptions preferences deemed likely based on the personality analysis.</span>
+                    <span v-show="!likely">This list compiles the consumptions preferences deemed unlikely based on the personality analysis.</span>
+                    To read more about the consumption preferences and what they mean, you can read the <a href="https://console.bluemix.net/docs/services/personality-insights/preferences.html#preferences" target="_blank">documentation.</a>
+                    </p>
+                </v-card-text>
             </v-expansion-panel-content>
         </v-expansion-panel>
         <v-list class="pref-list" two-line>
-            <v-list-tile v-for="pref in topPrefs" avatar>
+            <v-list-tile v-for="(pref, index) in topPrefs" :key="index" avatar>
                 <v-list-tile-avatar color="indigo lighten-5">
                     <v-icon size="20" v-show="likely" color="indigo accent-2">thumb_up</v-icon>
                     <v-icon size="20" v-show="!likely" color="indigo darken-4">thumb_down</v-icon>

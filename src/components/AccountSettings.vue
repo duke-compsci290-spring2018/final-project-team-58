@@ -1,5 +1,5 @@
 <template>
-<v-container>
+<v-container class="mb-4">
     <v-layout align-start justify-center>
         <v-flex xs12>
             <v-card>

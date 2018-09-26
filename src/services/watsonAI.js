@@ -5,8 +5,6 @@ import {
     WATSON_PERSONALITY_INSIGHTS_PASS
 } from './../secrets';
 
-import { API_URL } from "./../config.js"
-
 import ToneAnalyzerV3 from "watson-developer-cloud/tone-analyzer/v3"
 import PersonalityInsightsV3 from "watson-developer-cloud/personality-insights/v3"
 

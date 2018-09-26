@@ -1,6 +1,6 @@
 <template>
 <v-card class="elevation-12">
-    <v-toolbar dense dark color="purple darken-4">
+    <v-toolbar dense dark card color="purple darken-4">
         <v-tabs grow v-model="tabs" color="transparent" slider-color="cyan">
             <v-tab>
                 Login

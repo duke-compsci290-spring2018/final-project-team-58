@@ -1,0 +1,16 @@
+{
+    "administrator": "II1feCZ2Z9M1YdrFHfl5yhwjOk62",
+    "users": {
+        "II1feCZ2Z9M1YdrFHfl5yhwjOk62": {
+            "bookmarks": {},
+            "email": "alina.walling@duke.edu",
+            "history": {},
+            "name": "Alina Walling",
+            "page": "home"
+        }
+    },
+    "guest": {
+        "history": {},
+        "name": "Guest"
+    }
+}
