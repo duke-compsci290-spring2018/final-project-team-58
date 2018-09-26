@@ -45,9 +45,10 @@
     "not ie <= 8"
   ],
   "devDependencies": {
+    "@babel/node": "^7.0.0",
     "@fortawesome/fontawesome-free": "^5.3.1",
     "babel-cli": "^6.26.0",
-    "babel-core": "^6.26.0",
+    "babel-core": "^6.26.3",
     "babel-loader": "^7.1.2",
     "babel-preset-env": "^1.7.0",
     "babel-preset-stage-3": "^6.24.1",
