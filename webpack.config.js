@@ -30,7 +30,13 @@ module.exports = {
       {
         test: /\.js$/,
         loader: 'babel-loader',
-        exclude: /node_modules/
+        exclude: /node_modules/,
+        options: {
+          presets: ['env'],
+          presets: [
+            'babel-preset-env'
+          ].map(require.resolve)
+        }
       },
       {
         test: /\.(png|jpg|gif|svg)$/,
