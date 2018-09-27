@@ -8,8 +8,8 @@ const twitterSearchAuth = {
 }
 
 const twitterSearchConfig = {
-    url: "api.twitter.com/1.1/tweets/search/30day/",
-    env: "dev30"
+    url: "api.twitter.com/1.1/tweets/search/fullarchive/",
+    env: "dev"
 }
 
 exports.searchTweets = function(req, res) {

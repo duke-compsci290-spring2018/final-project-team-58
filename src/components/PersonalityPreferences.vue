@@ -9,7 +9,7 @@
     </v-toolbar>
     <v-container>
         <v-expansion-panel class="info-panel">
-            <v-expansion-panel-content value="infoPanel">
+            <v-expansion-panel-content v-model="infoPanel">
                 <v-card-text class="caption">
                     <p>The personality traits were obtained using <span class="font-weight-bold">IBM Watson's Personality Insights.</span> 
                     "The service groups the more than 40 consumption preferences into eight high-level categories. The preferences indicate the author's likelihood to prefer different products, services, and activities."
@@ -22,9 +22,9 @@
         </v-expansion-panel>
         <v-list class="pref-list" two-line>
             <v-list-tile v-for="(pref, index) in topPrefs" :key="index" avatar>
-                <v-list-tile-avatar color="indigo lighten-5">
-                    <v-icon size="20" v-show="likely" color="indigo accent-2">thumb_up</v-icon>
-                    <v-icon size="20" v-show="!likely" color="indigo darken-4">thumb_down</v-icon>
+                <v-list-tile-avatar color="pink lighten-5">
+                    <v-icon size="20" v-show="likely" color="pink">thumb_up</v-icon>
+                    <v-icon size="20" v-show="!likely" color="pink darken-4">thumb_down</v-icon>
                 </v-list-tile-avatar>
                 <v-list-tile-content>
                     {{ getName(pref) }}
