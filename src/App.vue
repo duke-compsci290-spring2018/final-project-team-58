@@ -977,36 +977,17 @@ export default {
                 var toneText = this.createToneText();
                 if (toneText) {
                     this.analyzeTone(toneText);
-                    if (this.results.tones) {
-                        var personalityText = this.createPersonalityText();
-                        if (personalityText.contentItems.length) {
-                            this.analyzePersonality(personalityText);
-                            if (this.results.personality) {
-                                console.log("everything worked");
-                                /*if (this.checkResults) {
-                                    console.log("results were checked");
-                                    this.addHistoryItem(this.results);
-                                    this.displayResults();
-                                    return;
-                                }*/
-                                return;
-                            } else {
-                                console.log("no personality profile");
-                                this.displayMessage("Unable to analyze personality.");
-                            }
-                        } else {
-                            console.log("couldn't make personality content");
-                            this.displayMessage("Unable to analyze personality.");
-                        }
-                    } else {
-                        console.log("no tones");
-                        this.displayMessage("Unable to analyze tone.");
-                    }
                 } else {
-                    console.log("couldn't make tone text");
+                    console.log("unable to make tone text");
                     this.displayMessage("Unable to analyze tone.");
                 }
-
+                var personalityText = this.createPersonalityText();
+                if (personalityText.contentItems.length) {
+                    this.analyzePersonality(personalityText);
+                } else {
+                    console.log("unable to make personality text");
+                    this.displayMessage("Unable to analyze personality.");
+                }
             } else {
                 console.log("no tweets in results");
                 this.displayMessage("Unable to search Tweets.");
