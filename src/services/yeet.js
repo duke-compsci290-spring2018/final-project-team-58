@@ -7,7 +7,7 @@ const twitterSearchAuth = {
     //access_token_secret: process.env.TWITTER_ACCESS_TOKEN_SECRET
 }
 
-export const twitterSearchConfig = {
+const twitterSearchConfig = {
     url: "api.twitter.com/1.1/tweets/search/30day/",
     env: "dev30"
 }

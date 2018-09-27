@@ -107,12 +107,12 @@ import {
     auth,
     db
 } from "./services/firebase"
-
+/*
 import {
     request,
     twitterSearchAuth,
     twitterSearchConfig
-} from "./services/yeet"
+} from "./services/yeet"*/
 
 import Search from "./components/Search.vue"
 import Results from "./components/Results.vue"
