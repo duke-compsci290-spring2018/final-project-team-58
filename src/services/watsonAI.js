@@ -1,12 +1,11 @@
-import { 
-    WATSON_TONE_ANALYZER_USER,
-    WATSON_TONE_ANALYZER_PASS,
-    WATSON_PERSONALITY_INSIGHTS_USER,
-    WATSON_PERSONALITY_INSIGHTS_PASS
-} from './../secrets';
 
-import ToneAnalyzerV3 from "watson-developer-cloud/tone-analyzer/v3"
-import PersonalityInsightsV3 from "watson-developer-cloud/personality-insights/v3"
+const WATSON_TONE_ANALYZER_USER = "fe8a6e93-7956-4537-88f6-cc2aeaf467a1"
+const WATSON_TONE_ANALYZER_PASS =  "orFyEbGYJmQg"
+const WATSON_PERSONALITY_INSIGHTS_USER = "8aaaf6cd-bbcd-4016-867c-4302346159b6"
+const WATSON_PERSONALITY_INSIGHTS_PASS = "5KJdgHMx1ywn"
+
+const ToneAnalyzerV3 = require("watson-developer-cloud/tone-analyzer/v3")
+const PersonalityInsightsV3 = require("watson-developer-cloud/personality-insights/v3")
 
 const toneAnalyzer = new ToneAnalyzerV3({
     username: WATSON_TONE_ANALYZER_USER,
@@ -22,9 +21,9 @@ const personalityInsights = new PersonalityInsightsV3({
     url: 'https://gateway.watsonplatform.net/personality-insights/api'
 });
 
-export default {
 
-    analyzeTone(req, res) {
+
+    exports.analyzeTone = function(req, res) {
 
         var tone_input = req.body;
 
@@ -45,9 +44,9 @@ export default {
                 }
             });
 
-    },
+    }
 
-    analyzePersonality(req, res) {
+    exports.analyzePersonality = function(req, res) {
         var content = req.body;
         var personalityParams = {
             content: content,
@@ -67,4 +66,3 @@ export default {
         })
     }
 
-}

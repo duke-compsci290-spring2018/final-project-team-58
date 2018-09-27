@@ -3,9 +3,9 @@ const HOST = process.env.HOST || '127.0.0.1'
 const PORT = process.env.PORT || 3000
 
 // use Express as our router
-import Express from 'express'
-import BodyParser from 'body-parser'
-import Cors from 'cors'
+const Express = require('express');
+const BodyParser = require('body-parser')
+const Cors = require('cors')
 
 // create express app
 const app = Express()
@@ -19,8 +19,8 @@ app.use(BodyParser.json())
 // list of URLs (and their protocols) that this server responds to
 
 
-import WatsonAPI from "./src/services/watsonAI.js"
-import Twitter from "./src/services/yeet.js"
+const WatsonAPI = require("./src/services/watsonAI.js")
+const Twitter = require("./src/services/yeet.js")
 
 app.post("/tweets", Twitter.searchTweets);
 app.post("/tones", WatsonAPI.analyzeTone);
@@ -28,7 +28,7 @@ app.post("/personality", WatsonAPI.analyzePersonality);
 
 // nothing useful for root URL to do
 app.get('/', (req, res) => {
-    res.json({"message": 'Welcome to Book List Tracker!'})
+    res.json({"message": "Welcome to Alina Walling's final project!"})
     res.end()
 })
 

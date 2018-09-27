@@ -12,10 +12,7 @@ export const twitterSearchConfig = {
     env: "dev30"
 }
 
-import { API_URL } from "./../config.js"
-
-export default {
-    searchTweets(req, res) {
+exports.searchTweets = function(req, res) {
         
         var query = req.body;
 
@@ -73,4 +70,3 @@ export default {
 
 
 
-}
