@@ -656,7 +656,7 @@ export default {
                 console.log("results good");
                 return true;
             }
-            console.log("resuls good");
+            console.log("results bad");
             return false;
         },
 
@@ -973,10 +973,14 @@ export default {
         },
 
         analyzeSearch() {
+            var toneSuccess = false;
+            var personalitySuccess = false;
+
             if (this.results.tweets) {
                 var toneText = this.createToneText();
                 if (toneText) {
                     this.analyzeTone(toneText);
+                    toneSuccess = true;
                 } else {
                     console.log("unable to make tone text");
                     this.displayMessage("Unable to analyze tone.");
@@ -984,6 +988,7 @@ export default {
                 var personalityText = this.createPersonalityText();
                 if (personalityText.contentItems.length) {
                     this.analyzePersonality(personalityText);
+                    personalitySuccess = true;
                 } else {
                     console.log("unable to make personality text");
                     this.displayMessage("Unable to analyze personality.");
@@ -993,6 +998,12 @@ export default {
                 this.displayMessage("Unable to search Tweets.");
             }
 
+            if (toneSuccess && personalitySuccess) {
+                console.log("worked!!");
+                return this.checkResults;
+            } else {
+                this.resetResults();
+            }
             this.loading = false;
         },
 
