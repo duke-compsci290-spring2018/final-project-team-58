@@ -132,6 +132,7 @@ import p3 from "./assets/data/personality-test-3.json"
 import p4 from "./assets/data/personality-test-4.json"
 
 import tweets from "./assets/data/tweets"
+import Vue from "vue"
 
 import {
     API_URL
@@ -884,8 +885,8 @@ export default {
 
             var app = this;
 
-            this.results.id = Date.now(),
-                this.results.query = q;
+            Vue.set(app.results, "id", Date.now());
+                Vue.set(app.results, "query", q);
                 this.loading = true;
             /*
                         var submittingSearch = new Promise(function(resolve, reject) {
@@ -1001,9 +1002,6 @@ export default {
 
             if (toneSuccess && personalitySuccess) {
                 console.log("worked!!");
-                this.addHistoryItem(this.results);
-                this.displayResults();
-                return
             } else {
                 this.resetResults();
             }
@@ -1029,16 +1027,7 @@ export default {
                 db.ref("users/" + this.user[".key"] + "/currentResults").remove();
             }
             this.isBookmark = false;
-
-            this.results = {
-                id: null,
-                query: "",
-                numTweets: 0,
-                numWords: 0,
-                tweets: [],
-                tones: [],
-                personality: {}
-            }
+            this.results = {};
         },
 
         resetCompare() {
@@ -1104,9 +1093,9 @@ export default {
                     console.log(data);
 
                     var tweets = data.results;
-                    app.results.numTweets = tweets.length;
+                    Vue.set(app.results, "numTweets", tweets.length);
 
-                    app.results.tweets = [];
+                    Vue.set(app.results, "tweets", []);
 
                     for (var i = 0; i < tweets.length; i++) {
                         app.results.tweets.push(app.parseTweetObject(tweets[i]));
@@ -1234,7 +1223,7 @@ export default {
                 }).then(response => response.json())
                 .then(data => {
                     console.log(data);
-                    app.results.tones = data.document_tone.tones;
+                    Vue.set(app.results, "tones", data.document_tone.tones);
                     /*app.results.tones = [];
 
                     for (var i = 0; i < data.document_tone.tone_categories.length; i++) {
@@ -1356,8 +1345,8 @@ export default {
                 }).then(response => response.json())
                 .then(data => {
                     console.log(data);
-                    app.results.personality = data;
-                    app.results.numWords = data.word_count;
+                    Vue.set(app.results, "personality", data);
+                    Vue.set(app.results, "numWords", data.word_count);
 
                 })
 
