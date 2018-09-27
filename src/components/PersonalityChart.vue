@@ -9,7 +9,7 @@
         </v-toolbar>
         <v-container>
             <v-expansion-panel class="info-panel">
-                <v-expansion-panel-content v-model="infoPanel">
+                <v-expansion-panel-content value="infoPanel">
                     <v-card-text class="caption">
                     <p>The personality traits were obtained using <span class="font-weight-bold">IBM Watson's Personality Insights.</span>  
                     <span v-show="chartID == 'personality'">The service analyzes personality traits based on the Big Five personality characteristics, which "represent the most widely used model for generally describing how a person engages with the world." The model includes five primary dimensions: agreeableness, conscientiousness, extraversion, emotional range, and openness. To read more about the Big Five personality characteristics and what they mean, check out the <a class="info" href="https://console.bluemix.net/docs/services/personality-insights/models.html#models" target="_blank">documentation</a>.</span>

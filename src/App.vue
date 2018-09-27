@@ -653,9 +653,11 @@ export default {
         checkResults() {
             console.log("checking results");
             var r = this.results;
-            if (r.numTweets > 0 && r.numWords > 0 && r.query && r.tweets.length > 0 && r.tones.length > 0 && r.personality != null) {
-                console.log("results good");
-                return true;
+            if (r != null) {
+                if (r.numTweets && r.numWords && r.query && r.tweets && r.tones && r.personality) {
+                    console.log("results good");
+                    return true;
+                }
             }
             console.log("results bad");
             return false;
@@ -886,8 +888,8 @@ export default {
             var app = this;
 
             Vue.set(app.results, "id", Date.now());
-                Vue.set(app.results, "query", q);
-                this.loading = true;
+            Vue.set(app.results, "query", q);
+            this.loading = true;
             /*
                         var submittingSearch = new Promise(function(resolve, reject) {
                             resolve();
@@ -1439,9 +1441,9 @@ export default {
 
         exportData() {
             var app = this;
-             var myWindow = window.open("/data" , "Results JSON");
-             myWindow.document.write(JSON.stringify(app.results));
-         }
+            var myWindow = window.open("/data", "Results JSON");
+            myWindow.document.write(JSON.stringify(app.results));
+        }
 
     }
 }

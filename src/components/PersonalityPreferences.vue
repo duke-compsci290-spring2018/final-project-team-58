@@ -9,7 +9,7 @@
     </v-toolbar>
     <v-container>
         <v-expansion-panel class="info-panel">
-            <v-expansion-panel-content v-model="infoPanel">
+            <v-expansion-panel-content value="infoPanel">
                 <v-card-text class="caption">
                     <p>The personality traits were obtained using <span class="font-weight-bold">IBM Watson's Personality Insights.</span> 
                     "The service groups the more than 40 consumption preferences into eight high-level categories. The preferences indicate the author's likelihood to prefer different products, services, and activities."
