@@ -694,7 +694,8 @@ export default {
     },
 
     watch: {
-        checkResults() {
+        results() {
+            console.log("that watch check results function is running my dude");
             if (this.checkResults && this.page != "results") {
                 console.log("results were checked");
                 this.addHistoryItem(this.results);
@@ -1000,7 +1001,6 @@ export default {
 
             if (toneSuccess && personalitySuccess) {
                 console.log("worked!!");
-                return this.checkResults;
             } else {
                 this.resetResults();
             }
