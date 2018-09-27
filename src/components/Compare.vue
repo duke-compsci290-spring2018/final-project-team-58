@@ -25,7 +25,7 @@
                         Searched on <span class="font-weight-bold">{{ resultsA.timestamp }}</span>
                     </p>
                     <p class="subheading">
-                        <v-icon class="mr-2" color="purple lighten-5">fas fa-twitter</v-icon>
+                        <v-icon class="mr-2" color="purple lighten-5">fab fa-twitter</v-icon>
                         <span class="font-weight-bold">{{ resultsA.numTweets }}</span> Tweets Analyzed
                     </p>
                     <p class="subheading">
@@ -39,7 +39,7 @@
                         Searched on <span class="font-weight-bold">{{ resultsB.timestamp }}</span>
                     </p>
                     <p class="subheading">
-                        <v-icon class="mr-2" color="purple lighten-5">fas fa-twitter</v-icon>
+                        <v-icon class="mr-2" color="purple lighten-5">fab fa-twitter</v-icon>
                         <span class="font-weight-bold">{{ resultsB.numTweets }}</span> Tweets Analyzed
                     </p>
                     <p class="subheading">
@@ -57,7 +57,7 @@
                 <tone-chart v-cloak chartID="tones-A" :tones="resultsA.tones" :header="false"></tone-chart>
             </v-flex>
             <v-flex xs12 md6 d-flex>
-                <tone-chart v-cloak chartID="tones-B" :tones="resultsB.tones" :header="false"></tone-chart>
+                <tone-chart class="compare2" v-cloak chartID="tones-B" :tones="resultsB.tones" :header="false"></tone-chart>
             </v-flex>
         </v-layout>
 
@@ -69,7 +69,7 @@
                 <personality-summary v-cloak :header="false" :text-summary="resultsA.summary"></personality-summary>
             </v-flex>
             <v-flex xs12 sm6 d-flex>
-                <personality-summary v-cloak :header="false" :text-summary="resultsB.summary"></personality-summary>
+                <personality-summary class="compare2" v-cloak :header="false" :text-summary="resultsB.summary"></personality-summary>
             </v-flex>
         </v-layout>
 
@@ -81,7 +81,7 @@
                 <personality-chart v-cloak chartID="personality-A" :traits="resultsA.traits" :header="false"></personality-chart>
             </v-flex>
             <v-flex xs12 sm6 d-flex>
-                <personality-chart v-cloak chartID="personality-B" :traits="resultsB.traits" :header="false"></personality-chart>
+                <personality-chart class="compare2" v-cloak chartID="personality-B" :traits="resultsB.traits" :header="false"></personality-chart>
             </v-flex>
         </v-layout>
 
@@ -93,7 +93,7 @@
                 <personality-chart v-cloak chartID="needs-A" :traits="resultsA.needs" :header="false"></personality-chart>
             </v-flex>
             <v-flex xs12 sm6 d-flex>
-                <personality-chart v-cloak chartID="needs-B" :traits="resultsB.needs" :header="false"></personality-chart>
+                <personality-chart class="compare2" v-cloak chartID="needs-B" :traits="resultsB.needs" :header="false"></personality-chart>
             </v-flex>
         </v-layout>
 
@@ -105,7 +105,7 @@
                 <personality-chart v-cloak chartID="values-A" :traits="resultsA.values" :header="false"></personality-chart>
             </v-flex>
             <v-flex xs12 sm6 d-flex>
-                <personality-chart v-cloak chartID="values-B" :traits="resultsB.values" :header="false"></personality-chart>
+                <personality-chart class="compare2" v-cloak chartID="values-B" :traits="resultsB.values" :header="false"></personality-chart>
             </v-flex>
         </v-layout>
 
@@ -117,7 +117,7 @@
                 <personality-preferences v-cloak :likely="true" :behaviors="resultsA.likelyPrefs" :header="false"></personality-preferences>
             </v-flex>
             <v-flex xs12 sm6 d-flex>
-                <personality-preferences v-cloak :likely="true" :behaviors="resultsB.likelyPrefs" :header="false"></personality-preferences>
+                <personality-preferences class="compare2" v-cloak :likely="true" :behaviors="resultsB.likelyPrefs" :header="false"></personality-preferences>
             </v-flex>
         </v-layout>
 
@@ -129,7 +129,7 @@
                 <personality-preferences v-cloak :likely="false" :behaviors="resultsA.unlikelyPrefs" :header="false"></personality-preferences>
             </v-flex>
             <v-flex xs12 sm6 d-flex>
-                <personality-preferences v-cloak :likely="false" :behaviors="resultsB.unlikelyPrefs" :header="false"></personality-preferences>
+                <personality-preferences class="compare2" v-cloak :likely="false" :behaviors="resultsB.unlikelyPrefs" :header="false"></personality-preferences>
             </v-flex>
         </v-layout>
 
@@ -191,5 +191,8 @@ export default {
 </script>
 
 <style>
+.compare2 {
+    background-color: rbga(255, 255, 255, 0.6) !important;
+}
 
 </style>

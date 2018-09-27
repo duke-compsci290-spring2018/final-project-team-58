@@ -68,7 +68,7 @@
         <p><span class="font-weight-bold">Nope!</span> You can search hashtags and view results freely without an account. However, if you want to bookmark or compare any of your results, you will need to <span class="font-weight-bold">create an account to save your data.</span></p>
         <v-divider class="my-4"></v-divider>
         <h2 class="orange--text text--lighten-3 display-1 font-weight-light mb-3">Who made this?</h2>
-        <p class="mb-0"><span class="font-weight-bold">Alina Walling</span> made this for her final project in her Web Development course at Duke University. Check out more about her at her <a class="info" href="alinawalling.com" target="_blank">personal website</a>! I hear she’s pretty cool :)</p>
+        <p class="mb-0"><span class="font-weight-bold">Alina Walling</span> made this for her final project in her Web Development course at Duke University. Check out more about her at her <a class="info" href="https://www.alinawalling.com" target="_blank">personal website</a>! I hear she’s pretty cool :)</p>
 
     </v-card-text>
 </v-card>
