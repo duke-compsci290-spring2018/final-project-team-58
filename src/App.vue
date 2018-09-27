@@ -1111,6 +1111,8 @@ export default {
                     var tweets = data.results;
                     app.results.numTweets = tweets.length;
 
+                    app.results.tweets = [];
+
                     for (var i = 0; i < tweets.length; i++) {
                         app.results.tweets.push(app.parseTweetObject(tweets[i]));
                     };
@@ -1480,6 +1482,7 @@ a.info {
     font-weight: 700;
     color: #8E24AA !important;
     transition: 1s;
+    background-color: transparent !important;
 }
 
 a.info:hover {
