@@ -1001,6 +1001,9 @@ export default {
 
             if (toneSuccess && personalitySuccess) {
                 console.log("worked!!");
+                this.addHistoryItem(this.results);
+                this.displayResults();
+                return
             } else {
                 this.resetResults();
             }
