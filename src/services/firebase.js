@@ -1,5 +1,7 @@
 // use Firebase as our database
-import Firebase from 'firebase'
+import Firebase from 'firebase/app'
+import 'firebase/auth'
+import 'firebase/database'
 
 // configure and connect to database
 var config = {
