@@ -11,7 +11,7 @@
         <v-expansion-panel class="info-panel">
             <v-expansion-panel-content v-model="infoPanel">
                 <v-card-text class="caption">
-                    <p>The personality summary was obtained using <span class="font-weight-bold">IBM Watson's Personality Insights Text Summary.</span> To read more about the text summary generator, check out the <a href="https://github.com/personality-insights/text-summary" target="_blank">documentation</a>.</p>
+                    <p>The personality summary was obtained using <span class="font-weight-bold">IBM Watson's Personality Insights Text Summary.</span> To read more about the text summary generator, check out the <a class="info" href="https://github.com/personality-insights/text-summary" target="_blank">documentation</a>.</p>
                 </v-card-text>
             </v-expansion-panel-content>
         </v-expansion-panel>

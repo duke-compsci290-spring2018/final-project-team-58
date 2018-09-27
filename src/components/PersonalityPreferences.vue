@@ -15,7 +15,7 @@
                     "The service groups the more than 40 consumption preferences into eight high-level categories. The preferences indicate the author's likelihood to prefer different products, services, and activities."
                     <span v-show="likely">This list compiles the consumptions preferences deemed likely based on the personality analysis.</span>
                     <span v-show="!likely">This list compiles the consumptions preferences deemed unlikely based on the personality analysis.</span>
-                    To read more about the consumption preferences and what they mean, you can read the <a href="https://console.bluemix.net/docs/services/personality-insights/preferences.html#preferences" target="_blank">documentation.</a>
+                    To read more about the consumption preferences and what they mean, you can read the <a class="info" href="https://console.bluemix.net/docs/services/personality-insights/preferences.html#preferences" target="_blank">documentation.</a>
                     </p>
                 </v-card-text>
             </v-expansion-panel-content>

@@ -1,6 +1,6 @@
 <template>
 <v-container class="mb-3" fluid>
-    <v-jumbotron>
+    <v-responsive>
         <v-container fill-height>
             <v-layout row wrap align-center justify-center>
                 <v-flex xs12 text-xs-center>
@@ -24,26 +24,22 @@
                 </v-flex>
                 <v-flex sm3 class="text-xs-center">
                     <v-layout d-flex column>
-                    <v-flex>
-                    <v-btn fab color="purple darken-1" :large="!signedIn" @click="downloadJSON">
-                        <v-icon color="white" :large="!signedIn">save_alt</v-icon>
-                    </v-btn>
-                    </v-flex>
-                    <v-flex>
-                    <v-btn fab @click="updateBookmark" color="pink lighten-2" v-if="signedIn">
-                        <v-icon v-if="!bookmarked" color="white">bookmark_border</v-icon>
-                        <v-icon v-if="bookmarked" color="white">bookmark</v-icon>
-                    </v-btn>
-                    <v-card v-if="!signedIn">
-                        <v-card-text class="body-2">Sign in or create an account to bookmark these results.</v-card-text>
-                    </v-card>
-                    </v-flex>
+                        <v-flex>
+                            <v-btn fab color="purple darken-1" :large="!signedIn" @click="downloadJSON">
+                                <v-icon color="white" :large="!signedIn">save_alt</v-icon>
+                            </v-btn>
+                        </v-flex>
+                        <v-flex>
+                            <v-btn fab @click="updateBookmark" color="pink lighten-2" v-if="signedIn">
+                                <v-icon v-if="!bookmarked" color="white">bookmark_border</v-icon>
+                                <v-icon v-if="bookmarked" color="white">bookmark</v-icon>
+                            </v-btn>
+                        </v-flex>
                     </v-layout>
-
                 </v-flex>
             </v-layout>
         </v-container>
-    </v-jumbotron>
+    </v-responsive>
     <v-container fluid grid-list-lg>
         <v-layout row wrap>
             <v-flex xs12 xl6 d-flex>
@@ -135,7 +131,7 @@ export default {
     },
 
     computed: {
-        likelyPrefsShort () {
+        likelyPrefsShort() {
             return this.likelyPrefs.splice(5);
         },
 

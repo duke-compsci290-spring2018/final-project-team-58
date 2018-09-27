@@ -1,6 +1,6 @@
 <template>
 <v-container class="mb-3" fluid>
-   <v-jumbotron height="250px">
+   <v-responsive height="250px">
         <v-container fill-height>
             <v-layout row align-center justify-center>
                 <v-flex xs6 text-xs-center>
@@ -15,7 +15,7 @@
                 </v-flex>
             </v-layout>
         </v-container>
-    </v-jumbotron>
+    </v-responsive>
 
     <v-container fluid grid-list-lg>
         <v-layout row wrap mb-5>

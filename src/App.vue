@@ -1475,14 +1475,14 @@ export default {
     display: none;
 }
 
-a {
+a.info {
     text-decoration: none;
     font-weight: 700;
     color: #8E24AA !important;
     transition: 1s;
 }
 
-a:hover {
+a.info:hover {
     color: #F06292 !important;
 }
 </style>

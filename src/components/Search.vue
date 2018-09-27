@@ -1,5 +1,5 @@
 <template>
-<v-jumbotron height="85vh">
+<v-responsive height="85vh">
     <v-container fill-height>
         <v-layout row wrap justify-center align-content-center>
             <v-flex xs12 mb-3>
@@ -7,8 +7,8 @@
                     How does the world feel about...
                 </h1>
             </v-flex>
-            <v-flex xs6 class="text-xs-center">
-                <v-text-field v-model="searchQuery" solo type="text" prefix="#">
+            <v-flex xs12 sm6 class="text-xs-center">
+                <v-text-field v-model="searchQuery" solo type="text" prefix="#" color="purple darken-4" label="Hashtag Search">
                     <v-btn slot="append-outer" style="top: -12px" fab small dark color="purple darken-4" @click="check">
                         <v-icon>arrow_forward</v-icon>
                     </v-btn>
@@ -16,7 +16,7 @@
             </v-flex>
         </v-layout>
     </v-container>
-</v-jumbotron>
+</v-responsive>
 </template>
 
 <script>
