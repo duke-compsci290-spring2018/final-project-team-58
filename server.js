@@ -16,12 +16,11 @@ app.use(BodyParser.urlencoded({ extended: true }))
 // parse JSON form data
 app.use(BodyParser.json())
 
-// list of URLs (and their protocols) that this server responds to
-
-
+// import Watson and Twitter services
 const WatsonAPI = require("./src/services/watsonAI.js")
-const Twitter = require("./src/services/yeet.js")
+const Twitter = require("./src/services/twitter.js")
 
+// list of URLs (and their protocols) that this server responds to
 app.post("/tweets", Twitter.searchTweets);
 app.post("/tones", WatsonAPI.analyzeTone);
 app.post("/personality", WatsonAPI.analyzePersonality);

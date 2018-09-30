@@ -1,69 +1,77 @@
-const TwitterClient = require('twitter');
-//const getBearerToken = require("get-twitter-bearer-token");
+// use Node Request Package
+const request = require("request");
 
-const TWITTER_CONSUMER_KEY = "hzpbBZl9Fh9OI11fx4CtnZLKf";
-const TWITTER_CONSUMER_SECRET = "Yniz3bWqNykpAXUvJswb2MXGkrQTDUpUknX3IY3goPEAHbocc3";
-const TWITTER_ACCESS_TOKEN = "264954753-qwp9PBo8fCVTB6qOCftRMVphJYFDI9K5KRbLnBbR";
-const TWITTER_ACCESS_TOKEN_SECRET = "ao5C4jwyPfCIaTK9C2CC545OV4foBd0zom2fd5wupjrha";
-var TWITTER_BEARER_TOKEN = "";
-/*
-getBearerToken(TWITTER_CONSUMER_KEY, TWITTER_CONSUMER_SECRET, (error, response) => {
-  if (error) {
-    // handle error
-    console.log(error);
-    console.log("oh no");
-  } else {
-    TWITTER_BEARER_TOKEN = response.body.access_token;
-    // bearer token
-    console.log("success!");
-    console.log(response.body.access_token);
-  }
-});*/
+// save Twitter API keys
+const twitterSearchAuth = {
+    consumer_key: "v88r6lWdrpiiYFrcYVZtwN4gx",
+    consumer_secret: "nvbKZnwuOpBajOKjGIJtBKfhtGOpdlp8GLNO46HoqIFIWvLCT7"
+}
 
-/*
-var R = require("request");
+// save Twitter API url
+const twitterSearchConfig = {
+    url: "api.twitter.com/1.1/tweets/search/fullarchive/",
+    env: "dev"
+}
 
-var key = TWITTER_CONSUMER_KEY;
-var secret = TWITTER_CONSUMER_SECRET;
-var cat = key +":"+secret;
-var credentials = new Buffer(cat).toString('base64');
+// search tweets function sent by server
+exports.searchTweets = function(req, res) {
+        // query search parameter
+        var query = req.body;
 
-var url = 'https://api.twitter.com/oauth2/token';
+        // generate Twitter credentials
+        var key = twitterSearchAuth.consumer_key;
+        var secret = twitterSearchAuth.consumer_secret;
+        var cat = key + ":" + secret;
+        var credentials = new Buffer(cat).toString('base64');
+
+        // request a Bearer Token from Twitter with credentials for authentication
+        request.post({
+            url: 'https://api.twitter.com/oauth2/token',
+            headers: {
+                "Authorization": "Basic " + credentials,
+                "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8"
+            },
+            body: "grant_type=client_credentials"
+
+        }, function (error, resp, result) {
+            // catch an error and end request
+            if (error) {
+                console.log(error);
+                res.send("error:" + error);
+                res.end();
+            }
+            // save the Bearer token retrieved from Twitter
+            var tokenData = JSON.parse(result);
+            var token = tokenData.access_token;
+
+            // submit search Tweets request to Twitter with Bearer Token authentication
+            request.post({
+                url: "https://" + twitterSearchConfig["url"] + twitterSearchConfig["env"] + ".json",
+                headers: {
+                    "Authorization": "Bearer " + token,
+                    "Content-Type": 'application/json'
+                },
+                body: query,
+                json: true
+            }, function (e, r, tweets) {
+                // catch an error and end request
+                if (e) {
+                    console.log(e);
+                    res.send("error:" + e);
+                    res.end();
+                } 
+                // send the Tweets to request
+                else {
+                    res.send(tweets);
+                    res.end();
+                }
+            });
+        });
+    }
 
 
-R.post({ url: url,
-    method:'POST',
-    headers: {
-        //"Access-Control-Allow-Origin": "*",
-        "Authorization": "Basic " + credentials,
-        "Content-Type":"application/x-www-form-urlencoded;charset=UTF-8",
-        "Access-Control-Allow-Methods": "GET, POST, OPTIONS, PUT",
-        "Access-Control-Allow-Headers": "Content-Type, Accept",
-        'Access-Control-Allow-Credentials': "true"
-        
-    },
-    body: "grant_type=client_credentials"
 
-}, function(err, resp, body) {
 
-  if (err) {
-    console.log(err);
-    console.log("oh no");
-  } else {
 
-  
 
-    //console.dir(body); //the bearer token...
-    console.log(body);
-    console.log("success");
-    TWITTER_BEARER_TOKEN = body;
-  }
-});
-*/
-export const twitter = new TwitterClient({
-    consumer_key: TWITTER_CONSUMER_KEY,
-    consumer_secret: TWITTER_CONSUMER_SECRET,
-    access_token_key: TWITTER_ACCESS_TOKEN,
-    access_token_secret: TWITTER_ACCESS_TOKEN_SECRET
-    //bearer_token: TWITTER_BEARER_TOKEN
-  });
+
