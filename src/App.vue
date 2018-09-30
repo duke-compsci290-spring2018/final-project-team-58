@@ -1,56 +1,80 @@
 <template>
 <div id="app">
     <v-app>
+
+        <!-- message for displaying errors and notifications to the user -->
         <v-snackbar v-model="message.visible" top>
             {{ message.text }}
             <v-btn color="cyan" flat @click="message.visible = false">
                 Close
             </v-btn>
         </v-snackbar>
+
+        <!-- TOOLBAR -->
         <v-toolbar color="transparent" flat height="80px">
 
+            <!-- back button arrow to go back to home page if on different page -->
             <v-btn fab small v-if="page != 'home'" @click="goTo('home')">
                 <v-icon>arrow_back</v-icon>
             </v-btn>
+
+            <!-- account settings speed dial button -->
             <v-speed-dial v-if="signedIn" v-model="userOptions" absolute bottom right direction="left" transition="slide-x-reverse-transition">
+                <!-- activator button to open menu -->
                 <v-btn slot="activator" fab small v-model="userOptions">
                     <v-icon>account_circle</v-icon>
                     <v-icon>close</v-icon>
                 </v-btn>
+                <!-- logout -->
                 <v-btn fab dark small color="orange lighten-1" @click="logout">
                     <v-icon>power_settings_new</v-icon>
                 </v-btn>
+                <!-- account settings -->
                 <v-btn fab dark small color="pink lighten-2" @click="goTo('account-settings')">
                     <v-icon>settings</v-icon>
                 </v-btn>
+                <!-- search history -->
                 <v-btn fab dark small color="purple darken-1" @click="goTo('account-history')">
                     <v-icon>history</v-icon>
                 </v-btn>
+                <!-- bookmarks -->
                 <v-btn fab dark small color="deep-purple darken-3" @click="goTo('account-bookmarks')">
                     <v-icon>bookmark</v-icon>
                 </v-btn>
+                <!-- user greeting -->
                 <v-chip color="transparent" text-color="white">
                     <h4 class="subheading font-weight-medium">
                         Hello, {{ user.name }}!
                     </h4>
                 </v-chip>
             </v-speed-dial>
+
+            <!-- sign in button if user not logged in -->
             <v-btn v-if="!signedIn" round absolute right v-model="loginDialog" @click.stop="loginDialog = true">
                 Sign In
             </v-btn>
         </v-toolbar>
+
+        <!-- login pop up dialog component shows if sign in button pressed -->
         <v-layout row justify-center v-if="!signedIn">
             <v-dialog v-model="loginDialog" max-width="500px" lazy>
                 <login-form :login="login" :register="register"></login-form>
             </v-dialog>
         </v-layout>
 
+        <!-- MAIN APP CONTENT -->
         <v-content>
+            <!-- search page with input and submit button -->
             <search v-if="page == 'home'" :submit-search="submitSearch" :display-message="displayMessage"></search>
+            <!-- results page to display with data once search submitted -->
             <results v-cloak v-if="page == 'results'" :results="results" :is-bookmark="isBookmark" :bookmark-save="updateBookmark" :signed-in="signedIn" :download-j-s-o-n="exportData"></results>
+            <!-- compare results page showing two results data sets side-by-side -->
             <compare v-cloak v-if="page == 'compare'" :search-a="toCompare[0]" :search-b="toCompare[1]"></compare>
+            <!-- account settings page to view user info if logged in -->
             <account-settings v-if="goToAccountPage" :user="user" :curr-tab="page" :view-bookmark="viewBookmark" :compare-bookmarks="compareResults" :delete-bookmark="deleteBookmark" :delete-all-bookmarks="deleteAllBookmarks" :delete-history-item="deleteHistoryItem" :delete-all-history="deleteAllHistory" :update-profile="updateProfile" :update-password="updatePassword" :delete-account="deleteAccount" :set-page="setPage" :master-history="masterHistory" :delete-guest-history="deleteGuestHistory" :admin="admin['.value']"></account-settings>
         </v-content>
+
+        <!-- loading dialog displayed while search is submitting -->
         <v-dialog v-model="loading" hide-overlay persistent width="300" lazy>
             <v-card color="purple darken-4" dark>
                 <v-card-text>
@@ -59,34 +83,24 @@
                 </v-card-text>
             </v-card>
         </v-dialog>
-        <!--<v-footer dark height="auto">
-            <v-card flat tile class="indigo lighten-1 white--text text-xs-center">
-                <v-card-text>
 
-                </v-card-text>
-
-                <v-card-text class="white--text pt-0">
-                    Phasellus feugiat arcu sapien, et iaculis ipsum elementum sit amet. Mauris cursus commodo interdum. Praesent ut risus eget metus luctus accumsan id ultrices nunc. Sed at orci sed massa consectetur dignissim a sit amet dui. Duis commodo vitae velit et
-                    faucibus. Morbi vehicula lacinia malesuada. Nulla placerat augue vel ipsum ultrices, cursus iaculis dui sollicitudin. Vestibulum eu ipsum vel diam elementum tempor vel ut orci. Orci varius natoque penatibus et magnis dis parturient
-                    montes, nascetur ridiculus mus.
-                </v-card-text>
-
-                <v-divider></v-divider>
-
-                <v-card-text class="white--text">
-                    &copy;2018 <strong>Alina Walling</strong>
-                </v-card-text>
-            </v-card>
-        </v-footer>-->
+        <!-- FOOTER -->
         <v-footer absolute color="transparent">
             <v-layout justify-space-between align-center row wrap white--text class="px-3">
                 <v-flex xs6 sm3 text-xs-center text-sm-left>
-                    <v-btn dark flat small class="ma-0 caption text-uppercase font-weight-bold spaced-letters" @click="infoDialog = true">What is this about?</v-btn>
+                    <!-- information button to bring up about page dialog -->
+                    <v-btn dark flat small class="ma-0 caption text-uppercase font-weight-bold spaced-letters" @click="infoDialog = true">
+                        What is this about?
+                    </v-btn>
                 </v-flex>
+                <!-- copyright information -->
                 <v-flex xs6 sm3 text-xs-center text-sm-right class="caption text-uppercase font-weight-bold spaced-letters">
-                    &copy; 2018 Alina Walling</v-flex>
+                    &copy; 2018 Alina Walling
+                </v-flex>
             </v-layout>
         </v-footer>
+
+        <!-- about page dialog -->
         <v-dialog v-model="infoDialog" scrollable max-width="700px">
             <info-dialog :close-dialog="closeInfoDialog"></info-dialog>
         </v-dialog>
@@ -95,48 +109,34 @@
 </template>
 
 <script>
-import {
-    toneAnalyzer,
-    personalityInsights
-} from "./services/watsonAI"
-import {
-    twitter
-} from "./services/twitter"
+// import Vue
+import Vue from "vue"
+
+// import Firebase
 import {
     firebase,
     auth,
     db
 } from "./services/firebase"
-/*
-import {
-    request,
-    twitterSearchAuth,
-    twitterSearchConfig
-} from "./services/yeet"*/
 
+// import Watson AI services
+import {
+    toneAnalyzer,
+    personalityInsights
+} from "./services/watsonAI"
+
+// import URL to server backend accessing APIs
+import {
+    API_URL
+} from './config'
+
+// import components
 import Search from "./components/Search.vue"
 import Results from "./components/Results.vue"
 import LoginForm from "./components/LoginForm.vue"
 import AccountSettings from "./components/AccountSettings.vue"
 import Compare from "./components/Compare.vue"
 import InfoDialog from "./components/InfoDialog.vue"
-
-import t1 from "./assets/data/tone-test-1.json"
-import t2 from "./assets/data/tone-test-2.json"
-import t3 from "./assets/data/tone-test-3.json"
-import t4 from "./assets/data/tone-test-4.json"
-
-import p1 from "./assets/data/personality-test-1.json"
-import p2 from "./assets/data/personality-test-2.json"
-import p3 from "./assets/data/personality-test-3.json"
-import p4 from "./assets/data/personality-test-4.json"
-
-import tweets from "./assets/data/tweets"
-import Vue from "vue"
-
-import {
-    API_URL
-} from './config'
 
 export default {
     name: 'App',
@@ -150,452 +150,48 @@ export default {
     },
 
     firebase: {
-        /*page: {
-            source: db.ref("page"),
-            asObject: true
-        },*/
+        // key of the admin user
         admin: {
             source: db.ref("administrator"),
             asObject: true
         },
-        guest: {
-            source: db.ref("users/guest"),
-            asObject: true
-        },
+        // guest user search history
         guestHistory: db.ref("users/guest/history")
     },
-
+    
     data() {
         return {
-            message: {
+            page: "home",           // current page displayed on app
+            message: {              // message text for displaying errors and notifications to user
                 visible: false,
                 text: ""
             },
-            page: "home",
-            username: "",
-            signedIn: false,
-            userOptions: false,
-            loginDialog: false,
-            infoDialog: false,
-            searchQuery: "",
-            loading: false,
-            results: {},
-            foundTweets: false,
-            isBookmark: false,
-            toCompare: [],
-            toneTests: [t1, t2, t3, t4],
-            personalityTests: [p1, p2, p3, p4],
-            testingTweets: [{
-                "timestamp": "Fri Sep 14 23:27:12 +0000 2018",
-                "id": "1040743798471569410",
-                "text": "RT @fleissmeister: So excited for next week!!! Let the journey begin... #TheBachelor"
-            }, {
-                "timestamp": "Fri Sep 14 23:27:07 +0000 2018",
-                "id": "1040743778523312128",
-                "text": "RT @KarenJDon: You didn't get a rose....says the APS to the majority of psychologists and our clients  https://t.co/85Sy5YhJym ….  HELP US…"
-            }, {
-                "timestamp": "Fri Sep 14 23:24:02 +0000 2018",
-                "id": "1040743001310416896",
-                "text": "RT @fleissmeister: So excited for next week!!! Let the journey begin... #TheBachelor"
-            }, {
-                "timestamp": "Fri Sep 14 23:19:24 +0000 2018",
-                "id": "1040741835017211904",
-                "text": "Jordan for Bachelor!!!!! #thebachelor #BachelorInParadise"
-            }, {
-                "timestamp": "Fri Sep 14 23:12:34 +0000 2018",
-                "id": "1040740116178853888",
-                "text": "'The Bachelor' Host Chris Harrison Admits Colton Underwood Was Picked As ABC's Leading Man For 'The Best TV'.… https://t.co/DHrRc4KGOR"
-            }, {
-                "timestamp": "Fri Sep 14 23:03:18 +0000 2018",
-                "id": "1040737784145891328",
-                "text": "We let out a sigh of relief when it was announced #TheBachelor isn’t airing until January 7th, but don’t worry… https://t.co/G93a1n37xU"
-            }, {
-                "timestamp": "Fri Sep 14 22:50:00 +0000 2018",
-                "id": "1040734438416502785",
-                "text": "RT @CObrochta33: Starting to think  @BachelorABC is casting puppies for @colton instead of women 🤔🤔 ... spoiler alert??#TheBachelor #abc"
-            }, {
-                "timestamp": "Fri Sep 14 22:48:45 +0000 2018",
-                "id": "1040734124212936704",
-                "text": "I despise Football and Country music &amp; not fond of dogs..I think I'll pass on auditioning for this seasons Bachelor… https://t.co/jIkZfoEEXm"
-            }, {
-                "timestamp": "Fri Sep 14 22:45:23 +0000 2018",
-                "id": "1040733274862243840",
-                "text": "RT @BachelorABC: Vote for #TheBachelor for #TheCompetitionShow of 2018 at the #PCAs by retweeting this post! @peopleschoice https://t.co/7B…"
-            }, {
-                "timestamp": "Fri Sep 14 22:42:12 +0000 2018",
-                "id": "1040732474727383040",
-                "text": "RT @CObrochta33: Starting to think  @BachelorABC is casting puppies for @colton instead of women 🤔🤔 ... spoiler alert??#TheBachelor #abc"
-            }, {
-                "timestamp": "Fri Sep 14 22:38:38 +0000 2018",
-                "id": "1040731575476875264",
-                "text": "I take back all of my positive Kamil posts!!! He is the WORST. #bye #bacheloreinparadise #teamAnnaliese #TheBachelor"
-            }, {
-                "timestamp": "Fri Sep 14 22:38:05 +0000 2018",
-                "id": "1040731437064970240",
-                "text": "The women of #TheBachelor scrubbing their social media before filming starts. https://t.co/xGb3ytLH8x"
-            }, {
-                "timestamp": "Fri Sep 14 22:32:09 +0000 2018",
-                "id": "1040729944584683520",
-                "text": "😡😡😡😡😡😡😡😡😡😡😡😡😡😡😡😡😡😡😡😡😡😡😡😡😡😡😡😡😡😡😡😡😡😡😡😡😡😡😡😡😡😡😡😡😡😡😡😡😡😡😡😡😡😡😡😡😡😡😡😡😡😡😡😡😡😡😡😡😡😡😡😡😡😡😡😡😡😡😡😡😡😡😡😡😡😡😡😡😡😡😡😡😡😡😡😡😡😡😡😡  #TheBachelor https://t.co/Ggd24kxQmi"
-            }, {
-                "timestamp": "Fri Sep 14 22:27:20 +0000 2018",
-                "id": "1040728731340496896",
-                "text": "It's Friiiiii-yay! #Y100rewind\n\n1) Alllllll #TheBachelor news this week including @AmabileJoe on #DWTS!\n2) Our Bra… https://t.co/JF1uMTR6PP"
-            }, {
-                "timestamp": "Fri Sep 14 22:24:14 +0000 2018",
-                "id": "1040727951992606721",
-                "text": "@balockaye_h Both of you guys were class acts throughout #TheBachelorette. Hope we see more of you at some point in… https://t.co/WRl57qHpaT"
-            }, {
-                "timestamp": "Fri Sep 14 22:14:46 +0000 2018",
-                "id": "1040725572421386240",
-                "text": "@fleissmeister Everyone CHILL. I didn’t want it to be Colton either but you know they won’t change it. I’ve accepte… https://t.co/kOavzITrhR"
-            }, {
-                "timestamp": "Fri Sep 14 22:13:52 +0000 2018",
-                "id": "1040725344263782400",
-                "text": "RT @fleissmeister: So excited for next week!!! Let the journey begin... #TheBachelor"
-            }, {
-                "timestamp": "Fri Sep 14 22:13:44 +0000 2018",
-                "id": "1040725310050844672",
-                "text": "RT @astrid_loch: The prince of paradise has become a king. Congratulations @Colt3FIVE 👑🌹#BachelorInParadise #TheBachelor"
-            }, {
-                "timestamp": "Fri Sep 14 22:13:09 +0000 2018",
-                "id": "1040725162486849541",
-                "text": "RT @bachbrack: If Tia so much as sets a foot on #TheBachelor set, so help me god...."
-            }, {
-                "timestamp": "Fri Sep 14 22:12:12 +0000 2018",
-                "id": "1040724927047970816",
-                "text": "RT @kevin_c_wendt: @Colt3FIVE will be an amazing bachelor 🌹 he’s kind, vulnerable and compassionate.. and he looks great in a suit. Let’s a…"
-            }, {
-                "timestamp": "Fri Sep 14 22:11:09 +0000 2018",
-                "id": "1040724659623342080",
-                "text": "RT @carolynbdavis: Colton was pressured the second he went on #BachelorInParadise to date Tia, got sent home by Becca because of Tia, &amp; the…"
-            }, {
-                "timestamp": "Fri Sep 14 22:10:23 +0000 2018",
-                "id": "1040724466215669761",
-                "text": "RT @Bachelor_Nation: Who was totally rooting for Tia &amp; Colton this season... but is also REALLY EXCITED to watch coltonunderwood as our nex…"
-            }, {
-                "timestamp": "Fri Sep 14 22:04:17 +0000 2018",
-                "id": "1040722932840972288",
-                "text": "RT @JustinaCoronel: Tia coming out of the limo on the first night now that Colton is #TheBachelor https://t.co/rkyc92G3Ew"
-            }, {
-                "timestamp": "Fri Sep 14 22:02:10 +0000 2018",
-                "id": "1040722398654488576",
-                "text": "Still convinced the whole Colton thing is a hoax and @Jason_Tartick is going to come out as #TheBachelor during the… https://t.co/WYQYYHCkZH"
-            }, {
-                "timestamp": "Fri Sep 14 22:01:46 +0000 2018",
-                "id": "1040722300629331969",
-                "text": "Is it too soon to get excited for #BachelorWinterGames ?? @chrisbharrison @Millsy11374 @fleissmeister… https://t.co/6xdQIF7eoN"
-            }, {
-                "timestamp": "Fri Sep 14 22:00:40 +0000 2018",
-                "id": "1040722022832074752",
-                "text": "My prediction for this season: Colton WILL get engaged... for 7 years before he actually marries her. #TheBachelor"
-            }, {
-                "timestamp": "Fri Sep 14 21:54:38 +0000 2018",
-                "id": "1040720504146063360",
-                "text": "This is Jason Tartick when he was 9 years old! He is with his dog, Mindy. \n(Photo is from his Instagram page.)… https://t.co/6rxTX89e1u"
-            }, {
-                "timestamp": "Fri Sep 14 21:51:39 +0000 2018",
-                "id": "1040719755177426944",
-                "text": "Im not sure how I feel about Colton being the new bachelor 🤔 #thebachelor"
-            }, {
-                "timestamp": "Fri Sep 14 21:44:45 +0000 2018",
-                "id": "1040718017464885248",
-                "text": "RT @alybarnaba: ABC: who do you want to be the next bachelor?\nus: JASON! BLAKE! JOE!\nABC: guess who’s back! Colton!\nus:\n#TheBachelor https:…"
-            }, {
-                "timestamp": "Fri Sep 14 21:44:42 +0000 2018",
-                "id": "1040718004168712192",
-                "text": "RT @fleissmeister: So excited for next week!!! Let the journey begin... #TheBachelor"
-            }, {
-                "timestamp": "Fri Sep 14 21:25:02 +0000 2018",
-                "id": "1040713054348967936",
-                "text": "@Peino Big Brother wouldn’t be the same without her. For the sake of the houseguests, I hope she stays! Or maybe it… https://t.co/Z6TfOYZpmz"
-            }, {
-                "timestamp": "Fri Sep 14 21:04:05 +0000 2018",
-                "id": "1040707781647491072",
-                "text": "#TheBachelor Colton Underwood reportedly willing &amp; \"very likely\" to lose his virginity on @BachelorABC: Colton Unde… https://t.co/uZcRQWfYJj"
-            }, {
-                "timestamp": "Fri Sep 14 20:56:57 +0000 2018",
-                "id": "1040705987106222082",
-                "text": "I can’t believe Amy - @RHAPRecapper said that #BachelorInParadise didn’t need two bartenders. Umm, did anything tha… https://t.co/q4yUlticT0"
-            }, {
-                "timestamp": "Fri Sep 14 20:56:32 +0000 2018",
-                "id": "1040705881342500865",
-                "text": "RT @KarenJDon: You didn't get a rose....says the APS to the majority of psychologists and our clients  https://t.co/85Sy5YhJym ….  HELP US…"
-            }, {
-                "timestamp": "Fri Sep 14 20:51:11 +0000 2018",
-                "id": "1040704538032799744",
-                "text": "@CObrochta33 @BachelorABC @colton Oh it's confirmed! My dog is wearing this night one 🌹#firstimpressionrose… https://t.co/ftU4p8jJuP"
-            }, {
-                "timestamp": "Fri Sep 14 20:49:00 +0000 2018",
-                "id": "1040703987140501506",
-                "text": "#TheBachelor Colton Underwood reportedly willing &amp; \"very likely\" to lose his virginity on @BachelorABC https://t.co/lWF2U1jJJ4"
-            }, {
-                "timestamp": "Fri Sep 14 20:48:01 +0000 2018",
-                "id": "1040703737638150150",
-                "text": "@fleissmeister wouldn't be surprised if Colton came out on after the final rose #TheBachelor"
-            }, {
-                "timestamp": "Fri Sep 14 20:38:29 +0000 2018",
-                "id": "1040701340270374912",
-                "text": "Chris is on damage control...this season is gonna be dumb. If Tia shows up then I swear...I'm gonna lose my FREAKIN… https://t.co/s7M9tclPy1"
-            }, {
-                "timestamp": "Fri Sep 14 20:38:05 +0000 2018",
-                "id": "1040701239149912064",
-                "text": "RT @isabelchandoit: #justiceforjordan #bip #BachelorNation #BACHELORINPARADISE #TheBachelor #jordanforbachelor https://t.co/ubpromhWf1"
-            }, {
-                "timestamp": "Fri Sep 14 20:34:47 +0000 2018",
-                "id": "1040700409961213952",
-                "text": "RT @fleissmeister: So excited for next week!!! Let the journey begin... #TheBachelor"
-            }, {
-                "timestamp": "Fri Sep 14 20:28:00 +0000 2018",
-                "id": "1040698700706795522",
-                "text": "I don’t know about yall, but I’d rather have someone we are confident wants these things *before* choosing them to… https://t.co/0HXy7YJD6L"
-            }, {
-                "timestamp": "Fri Sep 14 20:19:52 +0000 2018",
-                "id": "1040696655543197701",
-                "text": "RT @fleissmeister: So excited for next week!!! Let the journey begin... #TheBachelor"
-            }, {
-                "timestamp": "Fri Sep 14 20:17:39 +0000 2018",
-                "id": "1040696099495976962",
-                "text": "RT @fleissmeister: So excited for next week!!! Let the journey begin... #TheBachelor"
-            }, {
-                "timestamp": "Fri Sep 14 20:17:28 +0000 2018",
-                "id": "1040696051533983744",
-                "text": "So excited for next week!!! Let the journey begin... #TheBachelor"
-            }, {
-                "timestamp": "Fri Sep 14 20:09:32 +0000 2018",
-                "id": "1040694054193848321",
-                "text": "RT @CObrochta33: Starting to think  @BachelorABC is casting puppies for @colton instead of women 🤔🤔 ... spoiler alert??#TheBachelor #abc"
-            }, {
-                "timestamp": "Fri Sep 14 20:08:17 +0000 2018",
-                "id": "1040693741273661440",
-                "text": "RT @CObrochta33: Starting to think  @BachelorABC is casting puppies for @colton instead of women 🤔🤔 ... spoiler alert??#TheBachelor #abc"
-            }, {
-                "timestamp": "Fri Sep 14 19:58:27 +0000 2018",
-                "id": "1040691264327507970",
-                "text": "Can someone plz tell me how this whole Colton being a virgin and Bachelor is going to work come fantasy suite time.… https://t.co/B3j74VHx7Y"
-            }, {
-                "timestamp": "Fri Sep 14 19:57:58 +0000 2018",
-                "id": "1040691142294036480",
-                "text": "Excited is an understatement 😍🤤🔥🌹 #TheBachelor @colton @BachelorABC https://t.co/Gvlakfs4xF"
-            }, {
-                "timestamp": "Fri Sep 14 19:27:39 +0000 2018",
-                "id": "1040683514956529669",
-                "text": "RT @CObrochta33: Starting to think  @BachelorABC is casting puppies for @colton instead of women 🤔🤔 ... spoiler alert??#TheBachelor #abc"
-            }, {
-                "timestamp": "Fri Sep 14 19:21:00 +0000 2018",
-                "id": "1040681842528210949",
-                "text": "How are those background checks coming for the ladies of the Haus of Underwood? #TheBachelor #BachelorNation https://t.co/SLoAhKnKdG"
-            }, {
-                "timestamp": "Fri Sep 14 19:07:00 +0000 2018",
-                "id": "1040678319488819200",
-                "text": "#TheBachelor Colton is down to lose his virginity on TV. \n\nhttps://t.co/BHQ8ZiiUot https://t.co/ENkaXne01B"
-            }, {
-                "timestamp": "Fri Sep 14 19:03:33 +0000 2018",
-                "id": "1040677450391400448",
-                "text": "RT @isabelchandoit: #justiceforjordan #bip #BachelorNation #BACHELORINPARADISE #TheBachelor https://t.co/YD4uLAYPIM"
-            }, {
-                "timestamp": "Fri Sep 14 19:02:56 +0000 2018",
-                "id": "1040677293830615040",
-                "text": "RT @RealityRose_: TO ALL THE BOYS I LOVED BEFORE AND WANTED FOR #TheBachelor https://t.co/9NWt87SK2N"
-            }, {
-                "timestamp": "Fri Sep 14 18:47:35 +0000 2018",
-                "id": "1040673432130740224",
-                "text": "RT @SmithBruerAdv: Still think that TV can't be educational? Our marketing intern, Katie is here to prove you otherwise and justify your #T…"
-            }, {
-                "timestamp": "Fri Sep 14 18:46:15 +0000 2018",
-                "id": "1040673095265267712",
-                "text": "RT @SmithBruerAdv: Still think that TV can't be educational? Our marketing intern, Katie is here to prove you otherwise and justify your #T…"
-            }, {
-                "timestamp": "Fri Sep 14 18:44:22 +0000 2018",
-                "id": "1040672621468295168",
-                "text": "RT @CObrochta33: Starting to think  @BachelorABC is casting puppies for @colton instead of women 🤔🤔 ... spoiler alert??#TheBachelor #abc"
-            }, {
-                "timestamp": "Fri Sep 14 18:44:16 +0000 2018",
-                "id": "1040672596428288000",
-                "text": "Is Co-Bachelor’s a thing? #thebachelor"
-            }, {
-                "timestamp": "Fri Sep 14 18:44:15 +0000 2018",
-                "id": "1040672594326740992",
-                "text": "RT @danidONAT0: So I guess I won’t be watching #TheBachelor either... https://t.co/PVarq5mNtn"
-            }, {
-                "timestamp": "Fri Sep 14 18:41:14 +0000 2018",
-                "id": "1040671833899585536",
-                "text": "RT @CObrochta33: Starting to think  @BachelorABC is casting puppies for @colton instead of women 🤔🤔 ... spoiler alert??#TheBachelor #abc"
-            }, {
-                "timestamp": "Fri Sep 14 18:36:01 +0000 2018",
-                "id": "1040670519912226816",
-                "text": "RT @Bachelor__Bob: This is truly spectacular. Thanks @ravengates!! #TheBachelorette #TheBachelor #BachelorNation @balockaye_h @Jason_Tartic…"
-            }, {
-                "timestamp": "Fri Sep 14 18:34:00 +0000 2018",
-                "id": "1040670013038854144",
-                "text": "RT @bachelorburnbk: IF 👏  GROCERY 👏 STORE 👏 JOE 👏 IS 👏 SINGLE 👏 WHY 👏 ISN'T 👏 HE 👏 #TheBachelor 👏 #BachelorInParadise"
-            }, {
-                "timestamp": "Fri Sep 14 18:33:08 +0000 2018",
-                "id": "1040669796373807105",
-                "text": "RT @15mefarber: Last year: Give us Peter. \n\nBachelor franchise: Okay! How about some guy you dont even remember?\n\nThis year: Give us Wills,…"
-            }, {
-                "timestamp": "Fri Sep 14 18:11:17 +0000 2018",
-                "id": "1040664296303325185",
-                "text": "RT @BachelorABC: Vote for #TheBachelor for #TheCompetitionShow of 2018 at the #PCAs by retweeting this post! @peopleschoice https://t.co/7B…"
-            }, {
-                "timestamp": "Fri Sep 14 18:05:39 +0000 2018",
-                "id": "1040662879614234624",
-                "text": "RT @memes_bachelor: U know public reaction is bad when @fleissmeister and @Millsy11374 have to get Jason and Blake to reassure us #THEBACHE…"
-            }, {
-                "timestamp": "Fri Sep 14 17:55:24 +0000 2018",
-                "id": "1040660297038553088",
-                "text": "RT @CObrochta33: Starting to think  @BachelorABC is casting puppies for @colton instead of women 🤔🤔 ... spoiler alert??#TheBachelor #abc"
-            }, {
-                "timestamp": "Fri Sep 14 17:54:42 +0000 2018",
-                "id": "1040660124082360320",
-                "text": "RT @CObrochta33: Starting to think  @BachelorABC is casting puppies for @colton instead of women 🤔🤔 ... spoiler alert??#TheBachelor #abc"
-            }, {
-                "timestamp": "Fri Sep 14 17:52:45 +0000 2018",
-                "id": "1040659632455221249",
-                "text": "Alright reality tv show fans, it’s been a wild week. What was the craziest tv related moment of the week?… https://t.co/K97FsxuIMO"
-            }, {
-                "timestamp": "Fri Sep 14 17:41:13 +0000 2018",
-                "id": "1040656730789748736",
-                "text": "RT @isabelchandoit: #justiceforjordan #bip #BachelorNation #BACHELORINPARADISE #TheBachelor #jordanforbachelor https://t.co/ubpromhWf1"
-            }, {
-                "timestamp": "Fri Sep 14 17:22:01 +0000 2018",
-                "id": "1040651899731673089",
-                "text": "RT @TrashTV_Junkie: After Nick and Arie, we deserved one of them! #BachelorNation #TheBachelor 😭😭 https://t.co/YE8OEkhVzD"
-            }, {
-                "timestamp": "Fri Sep 14 17:14:52 +0000 2018",
-                "id": "1040650100270194688",
-                "text": "U know public reaction is bad when @fleissmeister and @Millsy11374 have to get Jason and Blake to reassure us… https://t.co/twuYK12M9o"
-            }, {
-                "timestamp": "Fri Sep 14 17:11:35 +0000 2018",
-                "id": "1040649273787015168",
-                "text": "After Nick and Arie, we deserved one of them! #BachelorNation #TheBachelor 😭😭 https://t.co/YE8OEkhVzD"
-            }, {
-                "timestamp": "Fri Sep 14 17:04:19 +0000 2018",
-                "id": "1040647445192028160",
-                "text": "#justiceforjordan #bip #BachelorNation #BACHELORINPARADISE #TheBachelor #jordanforbachelor https://t.co/0KwStI8jMA"
-            }, {
-                "timestamp": "Fri Sep 14 17:04:14 +0000 2018",
-                "id": "1040647422421151751",
-                "text": "#justiceforjordan #bip #BachelorNation #BACHELORINPARADISE #TheBachelor #jordanforbachelor https://t.co/1UaSDOdfQO"
-            }, {
-                "timestamp": "Fri Sep 14 17:04:08 +0000 2018",
-                "id": "1040647397259534337",
-                "text": "#justiceforjordan #bip #BachelorNation #BACHELORINPARADISE #TheBachelor #jordanforbachelor https://t.co/XoeJ7NYXJA"
-            }, {
-                "timestamp": "Fri Sep 14 17:04:03 +0000 2018",
-                "id": "1040647374958460928",
-                "text": "#justiceforjordan #bip #BachelorNation #BACHELORINPARADISE #TheBachelor #jordanforbachelor https://t.co/VcCLoA4HbK"
-            }, {
-                "timestamp": "Fri Sep 14 17:03:57 +0000 2018",
-                "id": "1040647352758022145",
-                "text": "#justiceforjordan #bip #BachelorNation #BACHELORINPARADISE #TheBachelor #jordanforbachelor https://t.co/ubpromhWf1"
-            }, {
-                "timestamp": "Fri Sep 14 17:03:52 +0000 2018",
-                "id": "1040647331442565121",
-                "text": "#justiceforjordan #bip #BachelorNation #BACHELORINPARADISE #TheBachelor #jordanforbachelor https://t.co/2XW7QKJLmq"
-            }, {
-                "timestamp": "Fri Sep 14 17:03:46 +0000 2018",
-                "id": "1040647305794334721",
-                "text": "#justiceforjordan #bip #BachelorNation #BACHELORINPARADISE #TheBachelor #jordanforbachelor https://t.co/BnsdcZMHew"
-            }, {
-                "timestamp": "Fri Sep 14 17:03:42 +0000 2018",
-                "id": "1040647288731955201",
-                "text": "#justiceforjordan #bip #BachelorNation #BACHELORINPARADISE #TheBachelor #jordanforbachelor https://t.co/StUAqHjDkF"
-            }, {
-                "timestamp": "Fri Sep 14 17:03:37 +0000 2018",
-                "id": "1040647267286491136",
-                "text": "#justiceforjordan #bip #BachelorNation #BACHELORINPARADISE #TheBachelor #jordanforbachelor https://t.co/2hM9qvXJOV"
-            }, {
-                "timestamp": "Fri Sep 14 17:03:31 +0000 2018",
-                "id": "1040647241718030342",
-                "text": "#justiceforjordan #bip #BachelorNation #BACHELORINPARADISE #TheBachelor #jordanforbachelor https://t.co/9LVITCfdet"
-            }, {
-                "timestamp": "Fri Sep 14 17:02:24 +0000 2018",
-                "id": "1040646961605566464",
-                "text": "#justiceforjordan #bip #BachelorNation #BACHELORINPARADISE #TheBachelor #jordanforbachelor https://t.co/vGzfas0q9N"
-            }, {
-                "timestamp": "Fri Sep 14 17:02:16 +0000 2018",
-                "id": "1040646928638390272",
-                "text": "#justiceforjordan #bip #BachelorNation #BACHELORINPARADISE #TheBachelor #jordanforbachelor https://t.co/0UaKBAuH2s"
-            }, {
-                "timestamp": "Fri Sep 14 17:02:11 +0000 2018",
-                "id": "1040646907423596545",
-                "text": "#justiceforjordan #bip #BachelorNation #BACHELORINPARADISE #TheBachelor #jordanforbachelor https://t.co/zBxZx9a09k"
-            }, {
-                "timestamp": "Fri Sep 14 17:02:04 +0000 2018",
-                "id": "1040646875462950912",
-                "text": "#justiceforjordan #bip #BachelorNation #BACHELORINPARADISE #TheBachelor #jordanforbachelor https://t.co/8LYeQdYz3C"
-            }, {
-                "timestamp": "Fri Sep 14 17:01:37 +0000 2018",
-                "id": "1040646765886795781",
-                "text": "#justiceforjordan #bip #BachelorNation #BACHELORINPARADISE #TheBachelor https://t.co/vGzfas0q9N"
-            }, {
-                "timestamp": "Fri Sep 14 17:01:32 +0000 2018",
-                "id": "1040646742881038342",
-                "text": "#justiceforjordan #bip #BachelorNation #BACHELORINPARADISE #TheBachelor https://t.co/3FtgUAubFF"
-            }, {
-                "timestamp": "Fri Sep 14 17:01:28 +0000 2018",
-                "id": "1040646725306855424",
-                "text": "#justiceforjordan #bip #BachelorNation #BACHELORINPARADISE #TheBachelor https://t.co/YD4uLAYPIM"
-            }, {
-                "timestamp": "Fri Sep 14 17:01:21 +0000 2018",
-                "id": "1040646698660454400",
-                "text": "#justiceforjordan #bip #BachelorNation #BACHELORINPARADISE #TheBachelor https://t.co/9vNxITA6sH"
-            }, {
-                "timestamp": "Fri Sep 14 17:01:14 +0000 2018",
-                "id": "1040646665806532609",
-                "text": "#justiceforjordan #bip #BachelorNation #BACHELORINPARADISE #TheBachelor https://t.co/jvU1WQQqIb"
-            }, {
-                "timestamp": "Fri Sep 14 16:59:45 +0000 2018",
-                "id": "1040646294207901696",
-                "text": "#justiceforjordan #bip #BachelorNation #BACHELORINPARADISE #TheBachelor https://t.co/1UaSDOdfQO"
-            }, {
-                "timestamp": "Fri Sep 14 16:59:38 +0000 2018",
-                "id": "1040646265292369920",
-                "text": "#justiceforjordan #bip #BachelorNation #BACHELORINPARADISE #TheBachelor https://t.co/XoeJ7NYXJA"
-            }, {
-                "timestamp": "Fri Sep 14 16:59:33 +0000 2018",
-                "id": "1040646242227970048",
-                "text": "#justiceforjordan #bip #BachelorNation #BACHELORINPARADISE #TheBachelor https://t.co/VcCLoA4HbK"
-            }, {
-                "timestamp": "Fri Sep 14 16:59:27 +0000 2018",
-                "id": "1040646219654221824",
-                "text": "#justiceforjordan #bip #BachelorNation #BACHELORINPARADISE #TheBachelor https://t.co/ubpromhWf1"
-            }, {
-                "timestamp": "Fri Sep 14 16:59:21 +0000 2018",
-                "id": "1040646193091620864",
-                "text": "#justiceforjordan #bip #BachelorNation #BACHELORINPARADISE #TheBachelor https://t.co/2XW7QKJLmq"
-            }, {
-                "timestamp": "Fri Sep 14 16:53:09 +0000 2018",
-                "id": "1040644634073092097",
-                "text": "RT @CObrochta33: Starting to think  @BachelorABC is casting puppies for @colton instead of women 🤔🤔 ... spoiler alert??#TheBachelor #abc"
-            }, {
-                "timestamp": "Fri Sep 14 16:33:21 +0000 2018",
-                "id": "1040639649625124864",
-                "text": "RT @CObrochta33: Starting to think  @BachelorABC is casting puppies for @colton instead of women 🤔🤔 ... spoiler alert??#TheBachelor #abc"
-            }, {
-                "timestamp": "Fri Sep 14 16:27:26 +0000 2018",
-                "id": "1040638161381220352",
-                "text": "RT @pornoacademie: #College #chick @ShonaRiver #threeway with #principal @RickAngelPorn #PorndoePremium #PornoAcademie @PorndoePremium http…"
-            }, {
-                "timestamp": "Fri Sep 14 16:15:26 +0000 2018",
-                "id": "1040635139728891904",
-                "text": "I love going on @WendyWilliams she truly never holds back like today when I shared that I was a 27 yr old virgin an… https://t.co/1vsTAx7oCE"
-            }, {
-                "timestamp": "Fri Sep 14 16:08:36 +0000 2018",
-                "id": "1040633422652137477",
-                "text": "RT @CObrochta33: Starting to think  @BachelorABC is casting puppies for @colton instead of women 🤔🤔 ... spoiler alert??#TheBachelor #abc"
-            }],
-            profileInput: {},
+            username: "",           // name of the user when registering for an account saved later to Firebase
+            signedIn: false,        // true when user logged in
+            userOptions: false,     // true when the user options speed-dial menu is open
+            loginDialog: false,     // true when user sign in popup dialog is showing
+            infoDialog: false,      // true when about page popup dialog is showing
+            searchQuery: "",        // search text typed into search input
+            loading: false,         // true when search submitted and loading dialog is showing
+            results: {},            // stores the results about the search grabbed from the APIs
+            isBookmark: false,      // true when the results being displayed are bookmarked
+            toCompare: []           // two results data sets displayed on compare page
         }
     },
 
+    // run this function upon creation of the app
     created: function () {
         var app = this;
+
+        // check if Firebase user authentication state has changed (user logged in or out)
         auth.onAuthStateChanged(function (user) {
+            // if a user is signed in
             if (user) {
                 app.signedIn = true;
+                // save the information of the user stored in firebase database in the app
                 db.ref().once("value").then(function (snapshot) {
+                    // if the user is new and does not exist in the firebase database (new user)
+                    // save their information from the authentication in the database
                     if (!snapshot.hasChild("users/" + user.uid)) {
                         db.ref("users/" + user.uid).set({
                             name: app.username,
@@ -606,38 +202,52 @@ export default {
                         });
                     }
                 });
+                // create firebase binding to user in database
                 app.$bindAsObject("user", db.ref("users/" + user.uid));
+                // create firebase binding to user's bookmarks in database
                 app.$bindAsArray("bookmarks", db.ref("users/" + user.uid + "/bookmarks"));
+                // create firebase binding to user's search history in database
                 app.$bindAsArray("history", db.ref("users/" + user.uid + "/history"));
 
+                // read the current page of the app the user is viewing
                 db.ref("users/" + user.uid + "/page").once("value").then(function (snapshot) {
+                    // set the app page to that value
                     if (snapshot.val()) {
                         app.page = snapshot.val();
                     } else {
+                        // set app page to home if no value
                         app.page = "home";
                     }
                 });
 
+                // read the current results the user is viewing (if on a results page)
                 db.ref("users/" + user.uid + "/currentResults").once("value").then(function (snapshot) {
+                    // set the app results object to the value
                     if (snapshot.val()) {
                         app.results = snapshot.val();
                         app.isBookmark = snapshot.val().isBookmark;
                     } else {
+                        // reset the app results if no value
                         app.resetResults();
                     }
                 });
 
+                // read the current set of comparing results the user is viewing (if on compare page)
                 db.ref("users/" + user.uid + "/currentCompare").once("value").then(function (snapshot) {
+                    // set the app compare to the value
                     if (snapshot.val()) {
                         app.toCompare = snapshot.val();
                     } else {
+                        // reset the app results if no value
                         app.resetCompare();
                     }
                 });
 
+            // if no user is signed in
             } else {
                 app.signedIn = false;
                 app.username = "";
+                // unbind the user information, bookmarks, and search history objects from firebase
                 if (app.user && app.bookmarks && app.history) {
                     app.$unbind("user");
                     app.$unbind("bookmarks");
@@ -645,24 +255,25 @@ export default {
                 }
             }
         });
-
     },
 
     computed: {
 
+        // check if the results object is completely populated with results information
+        // used to test whether or not the search and API requests were completed and data saved
+        // before displaying results page
         checkResults() {
-            console.log("checking results");
             var r = this.results;
             if (r != null) {
                 if (r.numTweets && r.numWords && r.query && r.tweets && r.tones && r.personality) {
-                    console.log("results good");
                     return true;
                 }
             }
-            console.log("results bad");
             return false;
         },
 
+        // check if the page is currently on an account viewing page
+        // return true if user is viewing bookmarks, search history, master search history, or settings
         goToAccountPage() {
             if (this.page == "account-bookmarks" || this.page == "account-history" || this.page == "account-master-history" || this.page == "account-settings") {
                 return true;
@@ -670,13 +281,19 @@ export default {
             return false;
         },
 
+        // generates the master search history of all user accounts and guest account
+        // list of master search history is viewable by the admin account
         masterHistory() {
             var master = [];
+            // check if user
             if (this.signedIn && this.user != null) {
+                // check if user is admin
                 if (this.user[".key"] == this.admin[".value"]) {
+                    // grab all the user info from firebase database
                     db.ref("users").once("value").then(function (snapshot) {
                         var val = snapshot.val();
                         if (val) {
+                            // get the search history of all users and add it to universal array
                             for (var u in val) {
                                 if (val[u].hasOwnProperty("history")) {
                                     for (var item in val[u]["history"]) {
@@ -692,20 +309,22 @@ export default {
                     });
                 }
             };
+            // return universal array
             return master;
         }
     },
 
     watch: {
+        // watch for when the results object changes and info is populated or deleted
         results() {
-            console.log("that watch check results function is running my dude");
+            // if the results are complete and the page is not viewing the results
             if (this.checkResults && this.page != "results") {
-                console.log("results were checked");
+                // add the results as a search history item
                 this.addHistoryItem(this.results);
+                // display results page
                 this.displayResults();
             }
         }
-
     },
 
     methods: {
@@ -714,145 +333,193 @@ export default {
          * WEB NAVIGATION
          * ------------------------------ */
 
+        // run when user makes request to go to a new page
+        // check to confirm if a user wants to leave a sensitive info page
         goTo(newPage) {
 
+            // confirm to leave results page
             if (this.page == "results") {
+                // warn a signed in user about bookmarking the results
                 if (this.signedIn) {
                     if (confirm("Are you sure you want to leave this page? You will lose the results unless you bookmark them.")) {
                         this.setPage(newPage);
                         this.resetResults();
                     }
                 } else {
-                    this.setPage(newPage);
-                    this.resetResults();
+                    if (confirm("Are you sure you want to leave this page?")) {
+                        this.setPage(newPage);
+                        this.resetResults();
+                    }
                 }
-            } else if (this.page == "compare") {
+            } 
+            // confirm to leave compare page
+            else if (this.page == "compare") {
                 if (confirm("Are you sure you want to leave this page?")) {
                     this.setPage(newPage);
                     this.resetCompare();
                 }
-            } else {
+            } 
+            // if not a sensitive data page just go to new page
+            else {
                 this.setPage(newPage);
             }
         },
 
+        // set the page of the app to the new page
         setPage(newPage) {
             this.page = newPage;
+            // save the new page as the current page in a user's firebase database
             if (this.user) {
-
                 db.ref("users/" + this.user[".key"] + "/page").set(this.page);
             }
         },
 
+        // display a temporary message for the user at the top of the page
+        // for error messages or general notifications
         displayMessage(text) {
             this.message.text = text;
             this.message.visible = true;
         },
 
+        // hide the about page dialog
+        closeInfoDialog() {
+            this.infoDialog = false;
+        },
+
         /* ------------------------------
-         * USERS
+         * MANAGING USERS
          * ------------------------------ */
 
+        // register a new user
         register(name, email, password) {
             this.username = name;
+            // save user in firebase authentication
             auth.createUserWithEmailAndPassword(email, password).catch(function (error) {
                 alert(error.message);
             });
         },
 
+        // log in an existing user
         login(email, password) {
+            // if there's a current user logged in, sign them out 
+            // (this would only occur in the case of an error)
             if (auth.currentUser) {
                 auth.signOut();
             } else {
+                // sign the user in with firebase authentication
                 auth.signInWithEmailAndPassword(email, password).catch(function (error) {
                     alert(error.message);
                 });
             }
         },
 
+        // log out a signed in user
         logout() {
+            // check a user is logged in and confirm the sign out
             if (auth.currentUser && confirm("Are you sure you want to log out?")) {
                 this.setPage("home");
                 auth.signOut();
             }
         },
 
+        // update a user's profile (name, email) information
         updateProfile(name, email, password) {
             var app = this;
+
+            // update the user name
             if (name != this.user.name) {
+                // change the display name in firebase
                 auth.currentUser.updateProfile({
                     displayName: name
                 }).then(function () {
+                    // save name in app username
                     app.username = name;
-
+                    // update the user name in the firebase database
                     var copy = app.user;
                     delete copy[".key"];
                     copy.name = name;
                     app.$firebaseRefs.user.set(copy);
-
+                    // display a confirmation message
                     app.displayMessage("Profile saved.");
                 }).catch(function (error) {
+                    // display error message
                     app.displayMessage("Unable to save profile changes.");
                     console.log(error);
                 });
             }
 
+            // update the user email
             if (email != this.user.email) {
+                // if the user also entered their password
                 if (password) {
+                    // create a credential with the user's entered email and password
                     const credential = firebase.auth.EmailAuthProvider.credential(this.user.email, password);
+                    // authenticate the user (to confirm they are themselves requesting info change)
                     auth.currentUser.reauthenticateAndRetrieveDataWithCredential(credential).then(function () {
+                        // update email in firebase auth
                         auth.currentUser.updateEmail(email).then(function () {
-
+                            // update email in firebase database
                             var copy = app.user;
                             delete copy[".key"];
                             copy.email = email;
                             app.$firebaseRefs.user.set(copy);
-
+                            // display confirmation message
                             app.displayMessage("Profile saved.");
                         }).catch(function (error) {
+                            // display error message about saving new email
                             app.displayMessage("Unable to save profile changes.");
                             console.log(error);
-                            // An error happened.
                         });
                     }).catch(function (error) {
+                        // display error message about reauthenticating user
                         console.log(error);
                         app.displayMessage("Unable to reauthenticate account credentials.")
                         // An error happened.
                     });
                 } else {
+                    // prompt user to enter password in addition to email for changing email address
                     this.displayMessage("Please enter your password before changing your email address.")
                 }
             }
-
         },
 
+        // update a user's password
         updatePassword(oldPassword, newPassword) {
             var app = this;
-
+            // create a credential with user's email and old password
             const credential = firebase.auth.EmailAuthProvider.credential(this.user.email, oldPassword);
+            // reauthenticate the user (to confirm they are themselves requesting info change)
             auth.currentUser.reauthenticateAndRetrieveDataWithCredential(credential).then(function () {
+                // update password in firebase auth
                 auth.currentUser.updatePassword(newPassword).then(function () {
+                    // display confirmation message
                     app.displayMessage("Password successfully updated.")
                 }).catch(function (error) {
+                    // display error message about saving password
                     console.log(error);
                     app.displayMessage("Unable to update password.")
                 });
-
             }).catch(function (error) {
+                // display error message about reauthenticating user
                 console.log(error);
                 app.displayMessage("Unable to reauthenticate account credentials.")
-                // An error happened.
             });
-
         },
 
+        // delete a user's account
         deleteAccount(email, password) {
             var app = this;
             var userID = this.user[".key"];
+
+            // confirm with user about deleting account
             if (confirm("Are you sure you want to delete your account? This cannot be undone!")) {
                 if (confirm("Are you SUPER SURE you want to delete your account? This is your last chance to change your mind.")) {
+                    
+                    // create credential with email and password
                     const credential = firebase.auth.EmailAuthProvider.credential(email, password);
+                    // reauthenticate user credentials
                     auth.currentUser.reauthenticateAndRetrieveDataWithCredential(credential).then(function () {
+                        // reset app to reflect no user signed in
                         app.setPage("home");
                         app.signedIn = false;
                         app.username = "";
@@ -861,152 +528,91 @@ export default {
                             app.$unbind("bookmarks");
                             app.$unbind("history");
                         }
+                        // remove user from firebase database
                         db.ref("users/" + userID).remove();
+                        // sign out of firebase auth
                         auth.signOut();
+                        // delete the user from firebase auth
                         auth.currentUser.delete().then(function () {
+                            // display confirmation message about account deletion
                             app.displayMessage("Account successfully deleted.");
                         }).catch(function (error) {
+                            // display error message about account deletion
                             console.log(error);
                             app.displayMessage("Unable to delete account.");
                         });
                     }).catch(function (error) {
+                        // prompt user to enter email and password before deleting account
                         console.log(error);
-                        app.displayMessage("Please make sure you've entered your current email address and password to reauthenticate before deleting.")
-                        // An error happened.
+                        app.displayMessage("Please make sure you've entered your current email address and password to reauthenticate before deleting.");
                     });
                 }
             }
-
         },
 
         /* ------------------------------
-         * PERFORM A SEARCH
+         * SUBMIT SEARCH
          * ------------------------------ */
 
+        // submit the search query
+        // run when "submit" button next to search input is pressed
         submitSearch(q) {
-
             var app = this;
-
+            // set the search id in the results object to the current time in milliseconds
             Vue.set(app.results, "id", Date.now());
+            // set the search query in the results object to the inputted text
             Vue.set(app.results, "query", q);
+            // show the loading dialog
             this.loading = true;
-            /*
-                        var submittingSearch = new Promise(function(resolve, reject) {
-                            resolve();
-                        });
-                        
-                        submittingSearch
-                        .then(app.searchTweets)
-                        .then(app.createToneText)
-                        .then(toneText => app.analyzeTone(toneText))
-                        .then(app.createPersonalityText)
-                        .then(personalityText => app.analyzePersonality(personalityText))
-                        .then(app.checkResults)
-                        .then (function () {
-                            this.addHistoryItem(this.results);
-                            this.displayResults();
-                            return;
-                        }).catch(error => {
-                            console.log(error);
-                            //app.resetResults();
-                        });
-                        
-            */
+            // search for Tweets with the search query via the Twitter API
             this.searchTweets();
-            //this.results.numTweets = 0;
-
-            /* if (q == "one") {
-                 this.results.tones = this.toneTests[0];
-                 this.results.personality = this.personalityTests[0];
-             } else if (q == "two") {
-                 this.results.tones = this.toneTests[1];
-                 this.results.personality = this.personalityTests[1];
-             } else if (q == "three") {
-                 this.results.tones = this.toneTests[2];
-                 this.results.personality = this.personalityTests[2];
-             } else if (q == "four") {
-                 this.results.tones = this.toneTests[3];
-                 this.results.personality = this.personalityTests[3];
-             } else {
-                 this.displayMessage("Problem.");
-                 this.resetResults();
-                 return;
-             }
-
-             this.addHistoryItem(this.results);
-             this.displayResults();*/
-
-            //this.results.tweets = this.testingTweets;
-
-            //this.searchTweets();
-            /*if (this.results.tweets) {
-                var toneText = this.createToneText();
-                if (toneText) {
-                    this.analyzeTone(toneText);
-                    if (this.results.tones) {
-                        var personalityText = this.createPersonalityText();
-                        if (personalityText.contentItems.length) {
-                            this.analyzePersonality(personalityText);
-                            if (this.results.personality) {
-                                this.addHistoryItem(this.results);
-                                this.displayResults();
-                                return;
-                            } else {
-                                console.log("no personality profile");
-                                this.displayMessage("Unable to analyze personality.");
-                            }
-                        } else {
-                            console.log("couldn't make personality content");
-                            this.displayMessage("Unable to analyze personality.");
-                        }
-                    } else {
-                        console.log("no tones");
-                        this.displayMessage("Unable to analyze tone.");
-                    }
-                } else {
-                    console.log("couldn't make tone text");
-                    this.displayMessage("Unable to analyze tone.");
-                }
-
-            } else {
-                console.log("no tweets in results");
-                this.displayMessage("Unable to search Tweets.");
-            }*/
-
-            //this.resetResults();
         },
 
+        // analyze the Tweets retrieved from search query with Watson AI
+        // run Tone Analyzer and Personality Insights
         analyzeSearch() {
             var toneSuccess = false;
             var personalitySuccess = false;
 
+            // verify there are Tweets saved in the results object
             if (this.results.tweets) {
+
+                // create the text passed to Watson Tone Analyzer from the Tweets
                 var toneText = this.createToneText();
+                // if successfully created text parameter
                 if (toneText) {
+                    // analyze the tone of the Tweet text
                     this.analyzeTone(toneText);
                     toneSuccess = true;
                 } else {
-                    console.log("unable to make tone text");
+                    // display error message if no text
+                    console.log("Unable to make tone text from Tweets.");
                     this.displayMessage("Unable to analyze tone.");
                 }
+
+                // create the text passed to Watson Personality Insights from the Tweets
                 var personalityText = this.createPersonalityText();
+                // if successfully created the text parameter
                 if (personalityText.contentItems.length) {
+                    // analyze the personality of the Tweet text
                     this.analyzePersonality(personalityText);
                     personalitySuccess = true;
                 } else {
-                    console.log("unable to make personality text");
+                    // display error message if no text
+                    console.log("Unable to make personality text from the Tweets.");
                     this.displayMessage("Unable to analyze personality.");
                 }
             } else {
-                console.log("no tweets in results");
+                // display error message if no Tweets in results
+                console.log("No tweets in results.");
                 this.displayMessage("Unable to search Tweets.");
             }
-
-            if (toneSuccess && personalitySuccess) {
-                console.log("worked!!");
-            } else {
+            // if tone and personality analysis failed reset the results
+            if (!toneSuccess && !personalitySuccess) {
+                this.displayResults("Search failed.");
                 this.resetResults();
             }
+            // hide loading dialog
             this.loading = false;
         },
 
@@ -1014,329 +620,243 @@ export default {
          * DISPLAY RESULTS
          * ------------------------------ */
 
+        // save and display the search results
         displayResults() {
+            // if a user is signed in save the current results page in user firebase database
             if (this.user) {
                 db.ref("users/" + this.user[".key"] + "/currentResults").set(this.results);
                 db.ref("users/" + this.user[".key"] + "/currentResults/isBookmark").set(this.isBookmark);
             }
+            // set loading dialog to false (should only still be showing in case of an error)
             this.loading = false;
+            // set the page to the results
             this.setPage("results");
         },
 
+        // reset the search results
+        // run when leaving results page or the search failed
         resetResults() {
+            // if a user is signed in remove results from their current results in firebase database
             if (this.user) {
-
                 db.ref("users/" + this.user[".key"] + "/currentResults").remove();
             }
+            // set the bookmark and results object to empty
             this.isBookmark = false;
             this.results = {};
         },
 
-        resetCompare() {
-            if (this.user) {
-                db.ref("users/" + this.user[".key"] + "/currentCompare").remove();
-            }
-            this.toCompare = [];
+        // export the results data as JSON data
+        exportData() {
+            var app = this;
+            // open JSON in a new window
+            var myWindow = window.open("/data", "Results JSON");
+            myWindow.document.write(JSON.stringify(app.results));
         },
 
+        /* ------------------------------
+         * DISPLAY BOOKMARKED RESULTS
+         * ------------------------------ */
+
+        // view the results of a user's bookmarked search accessed from their account info
+        // pass in the bookmarked results information as a parameter
         viewBookmark(item) {
+            // set the app results to the bookmarked data
             this.results = item;
             this.isBookmark = true;
+            // set the page to the results
             this.setPage("results");
 
+            // save the displaying results to the user's current results in firebase database
+            // remove the ".key" attribute from firebase vue bindings to write object to firebase database
             let save = Object.assign({}, this.results);
             delete save[".key"];
-
             db.ref("users/" + this.user[".key"] + "/currentResults").set(save);
             db.ref("users/" + this.user[".key"] + "/currentResults/isBookmark").set(this.isBookmark);
         },
 
+        /* ------------------------------
+         * COMPARE RESULTS
+         * ------------------------------ */
+
+        // view two sets of bookmarked results side-by-side in compare view
+        // pass in the two bookmarked results information as a parameter
         compareResults(bookmarks) {
+            // set the app compare array to the bookmarked data
             this.toCompare = bookmarks;
 
+            // save the displaying results to the user's current compare in firebase database
+            // remove the ".key" attribute from firebase vue bindings to write object to firebase database
             if (this.user) {
-
                 let save1 = Object.assign({}, this.toCompare[0]);
                 delete save1[".key"];
-
                 let save2 = Object.assign({}, this.toCompare[1]);
                 delete save2[".key"];
-
                 var saveCompare = [save1, save2];
                 db.ref("users/" + this.user[".key"] + "/currentCompare").set(saveCompare);
             }
+
+            // set the app page to the compare page
             this.setPage("compare");
+        },
+
+        // reset the compared results
+        // run when leaving the compare page
+        resetCompare() {
+            // reset user's current compare in firebase database
+            if (this.user) {
+                db.ref("users/" + this.user[".key"] + "/currentCompare").remove();
+            }
+            // reset app compare array
+            this.toCompare = [];
         },
 
         /* ------------------------------
          * SEARCH TWEETS
          * ------------------------------ */
 
+        // submit the search query to Twitter API and retreive Tweet data
         searchTweets() {
-
-            console.log("searching tweets");
-
             var app = this;
-
+            
+            // save the search query as a parameter for Twitter API request
             var query = {
                 "query": "#" + app.results.query
             }
 
-            console.log(query);
+            //console.log(query);
 
+            // fetch Tweets from server
             fetch(`${API_URL}/tweets`, {
                     method: 'POST',
                     body: JSON.stringify(query),
                     headers: {
                         "Content-Type": "application/json"
                     }
-                }).then(response => response.json())
+                })
+                // retrieve the JSON of the results from the API
+                .then(response => response.json())
+                // use the JSON data
                 .then(data => {
-                    console.log(data);
-
+                    //console.log(data);
                     var tweets = data.results;
+
+                    // set the number of Tweets in results object to number of Tweets retrieved
                     Vue.set(app.results, "numTweets", tweets.length);
-
+                    // set the Tweets array in results object to empty array
                     Vue.set(app.results, "tweets", []);
-
+                    // for each Tweet in the results...
                     for (var i = 0; i < tweets.length; i++) {
+                        // parse out only relevant data of each Tweet and save in results object array
                         app.results.tweets.push(app.parseTweetObject(tweets[i]));
                     };
 
-                    console.log(app.results.tweets);
+                    //console.log(app.results.tweets);
+
+                    // analyze Tweet data
                     app.analyzeSearch();
-
                 })
-
-                /*.then(function() {
-                    return Promise.resolve(app.results.tweets);
-                })*/
+                // catch an error with the request
                 .catch(error => {
+                    // display error message
                     console.log(error);
-                    //return Promise.reject(error);
+                    app.displayMessage("Error searching for Tweets.");
                 });
-            /*
-                        var query = {
-                            "query": "#" + app.results.query
-                        }
-
-                        var key = "v88r6lWdrpiiYFrcYVZtwN4gx";
-                        var secret = "nvbKZnwuOpBajOKjGIJtBKfhtGOpdlp8GLNO46HoqIFIWvLCT7";
-                        var cat = key + ":" + secret;
-                        var credentials = new Buffer(cat).toString('base64');
-
-                        request({
-                            url: "${ API_URL }" + 'https://api.twitter.com/oauth2/token',
-                            method: 'POST',
-                            headers: {
-                                "Authorization": "Basic " + credentials,
-                                "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8"
-                            },
-                            body: "grant_type=client_credentials"
-
-                        }, function (err, resp, body) {
-
-                            if (err) {
-                                console.log(err);
-                                return;
-                            }
-
-                            console.dir(body); //the bearer token...
-                            var tokenData = JSON.parse(body);
-                            var token = tokenData.access_token;
-
-                            request.post({
-                                url: "${ API_URL }" + "https://" + twitterSearchConfig["url"] + twitterSearchConfig["env"] + ".json",
-                                headers: {
-                                    "Authorization": "Bearer " + token,
-                                    "Content-Type": 'application/json'
-                                },
-                                body: query,
-                                json: true
-                            }, function (e, r, body) {
-                                if (e) {
-                                    console.log(e);
-                                    return false;
-                                }
-                                console.log(body);
-
-                                var tweets = body.results;
-
-                                app.results.numTweets = tweets.length;
-
-                                for (var i = 0; i < tweets.length; i++) {
-                                    app.results.tweets.push(app.parseTweetObject(tweets[i]));
-                                };
-                            })
-
-                        });*/
         },
 
+        // parse out only necessary data for each Tweet object
         parseTweetObject(tweet) {
             var t = {};
-
+            // save the timestamp, id, and text from each Tweet
+            // don't worry about information about the Twitter user, location, etc.
             t.timestamp = tweet["created_at"];
             t.id = tweet["id_str"];
             t.text = tweet["text"];
-
+            // return parsed Tweet object
             return t;
-
         },
 
         /* ------------------------------
          * TONE ANALYZER
          * ------------------------------ */
 
+        // format the text passed to Tone Analyzer from the Tweets
         createToneText() {
-
-            console.log("creating tone text");
             var text = "";
-
+            // save the text from each Tweet into a large body of text
             for (var i = 0; i < this.results.tweets.length; i++) {
                 text += ". " + this.results.tweets[i].text;
             }
+            //console.log(text);
 
-            console.log(text);
+            // return aggregate Tweet text
             return text;
-            /*if (text) {
-                return Promise.resolve(text);
-            } else {
-                return Promise.reject("Could not create tone text.")
-            }*/
-
         },
 
+        // analyze the tone using the Watson AI Tone Analyzer API
         analyzeTone(text) {
-
-            console.log("analyzing tone");
-
             var app = this;
-
+            // set the text input parameter to the text created from Tweets
             var tone_input = {
                 text: text
             };
 
+            // fetch tone analysis from server
             fetch(`${API_URL}/tones`, {
                     method: 'POST',
                     body: JSON.stringify(tone_input),
                     headers: {
                         "Content-Type": "application/json"
                     }
-                }).then(response => response.json())
-                .then(data => {
-                    console.log(data);
-                    Vue.set(app.results, "tones", data.document_tone.tones);
-                    /*app.results.tones = [];
-
-                    for (var i = 0; i < data.document_tone.tone_categories.length; i++) {
-                        for (var j = 0; j < data.document_tone.tone_categories[i].tones.length; j++) {
-                            app.results.tones.push(data.document_tone.tone_categories[i].tones[j])
-                        }
-                    }*/
-
                 })
-                /*.then(function() {return Promise.resolve(app.results.tones);})*/
+                // retrieve the JSON of the API results
+                .then(response => response.json())
+                // use the JSON data
+                .then(data => {
+                    //console.log(data);
+                    
+                    // set the app results object tones to the tones found in the data
+                    Vue.set(app.results, "tones", data.document_tone.tones);
+                })
+                // catch an error in analyzing tone
                 .catch(error => {
+                    // display error message
                     console.log(error);
-                    //return Promise.reject(error)
+                    app.displayMessage("Error in analyzing tone.");
                 });
-
-            /*
-                        var toneParams = {
-                            tone_input: {
-                                text: text
-                            },
-                            content_type: "application/json",
-                            sentences: false
-                        };
-
-                        toneAnalyzer.tone(toneParams, function (error, toneAnalysis) {
-                            if (error) {
-                                console.log(error);
-                                return;
-                            } else {
-                                console.log(toneAnalysis);
-                                app.results.tones = [];
-
-                                for (var i = 0; i < toneAnalysis.document_tone.tone_categories.length; i++) {
-                                    for (var j = 0; j < toneAnalysis.document_tone.tone_categories[i].tones.length; j++) {
-                                        app.results.tones.push(toneAnalysis.document_tone.tone_categories[i].tones[j])
-                                    }
-                                }
-                            }
-                        });
-
-                        if (this.results.tones) {
-                            return true;
-                        } else {
-                            return false;
-                        }*/
         },
 
         /* ------------------------------
          * PERSONALITY INSIGHTS
          * ------------------------------ */
 
+        // format the text passed to Personality Insights from the Tweets
         createPersonalityText() {
-
-            console.log("creating personality text");
-
             var app = this;
-
             var content = {
                 contentItems: []
             };
 
+            // save the text from each Tweet in the required Personality Insights format
             for (var i = 0; i < this.results.tweets.length; i++) {
-
                 var item = {
                     content: app.results.tweets[i].text,
                     contenttype: "text/plain",
                     id: app.results.tweets[i].id,
                     language: "en"
                 };
-
                 content.contentItems.push(item);
             }
-            this.profileInput = content;
-            console.log(content);
+            //console.log(content);
+
+            // return the formated text object
             return content;
-
-            /* if (content) {
-                 return Promise.resolve(content);
-             } else {
-                 return Promise.reject("Could not create personality text.")
-             }*/
-
         },
 
+        // analyze the personality using the Watson AI Personality Insights API
         analyzePersonality(content) {
-
-            console.log("analyzing personality");
             var app = this;
-            /*
-                        var personalityParams = {
-                            content: content,
-                            content_type: "application/json",
-                            consumption_preferences: true
-                        };
 
-                        personalityInsights.profile(
-                            
-                                personalityParams
-                            ,
-                            function (error, profile) {
-                                if (error) {
-                                    console.log(error);
-                                    
-                                } 
-                                    console.log("yeet");
-                                    console.log(profile);
-                                    app.results.personality = profile;
-                                
-                            });
-            */
-
+            // fetch the personality profile from the server
             fetch(`${API_URL}/personality`, {
                     method: 'POST',
                     body: JSON.stringify(content),
@@ -1344,28 +864,31 @@ export default {
                         "Content-Type": "application/json",
                         "Accept": "application/json"
                     }
-                }).then(response => response.json())
-                .then(data => {
-                    console.log(data);
-                    Vue.set(app.results, "personality", data);
-                    Vue.set(app.results, "numWords", data.word_count);
-
                 })
+                // retrieve the results JSON
+                .then(response => response.json())
+                // use the JSON data
+                .then(data => {
+                    //console.log(data);
 
-                /*.then(function() {
-                    return Promise.resolve(app.results.personality);
-                })*/
+                    // set the app results object personality to the data
+                    Vue.set(app.results, "personality", data);
+                    // set the app results object number of words analyzed to word count from data
+                    Vue.set(app.results, "numWords", data.word_count);
+                })
+                // catch an error
                 .catch(error => {
+                    // display error message
                     console.log(error);
-                    //return Promise.reject(error);
+                    app.displayMessage("Error in analyzing personality.");
                 });
-
         },
 
         /* ------------------------------
-         * BOOKMARKS
+         * MANAGE BOOKMARKS
          * ------------------------------ */
 
+        // manage whether to add or delete a bookmark
         updateBookmark(save, bookmark) {
             if (save && bookmark) {
                 this.isBookmark = save;
@@ -1375,41 +898,58 @@ export default {
             }
         },
 
+        // bookmark the results
         addBookmark(item) {
             var num = this.bookmarks.length;
+            // add the new results to the user's bookmarks in the firebase database
             this.$firebaseRefs.bookmarks.push(item);
+            // set the app results to the bookmarked results
             this.results = this.bookmarks[num];
+            // save the current results and bookmark in the user's firebase database
             db.ref("users/" + this.user[".key"] + "/currentResults").set(item);
             db.ref("users/" + this.user[".key"] + "/currentResults/isBookmark").set(this.isBookmark);
         },
 
+        // delete a bookmark
         deleteBookmark(item) {
+            // confirm deletion
             if (confirm("Are you sure you want to delete this bookmark?")) {
+                // remove bookmark from user's firebase database
                 this.$firebaseRefs.bookmarks.child(item['.key']).remove();
+                // set bookmark to false
                 this.isBookmark = false;
                 db.ref("users/" + this.user[".key"] + "/currentResults/isBookmark").set(this.isBookmark);
             }
         },
 
+        // delete all the user's saved bookmarks
         deleteAllBookmarks() {
+            // confirm deletion
             if (confirm("Are you sure you want to delete all of your bookmarks?")) {
+                // remove the bookmarks from the user's firebase database
                 this.$firebaseRefs.bookmarks.remove();
             }
         },
 
         /* ------------------------------
-         * SEARCH HISTORY
+         * MANAGE SEARCH HISTORY
          * ------------------------------ */
 
+        // add a search to the user's search history
         addHistoryItem() {
             var app = this;
             var date = new Date(this.results.id);
+            // if a user is signed in
             if (this.signedIn) {
+                // add information about the search to their individual search history
                 this.$firebaseRefs.history.push({
                     name: app.results.query,
                     timestamp: date.toLocaleString()
                 });
-            } else {
+            } 
+            // if no user signed in...
+            else {
+                // add information about the search to guest user search history
                 this.$firebaseRefs.guestHistory.push({
                     name: app.results.query,
                     timestamp: date.toLocaleString()
@@ -1417,32 +957,32 @@ export default {
             }
         },
 
+        // delete an item from user's search history
         deleteHistoryItem(item) {
+            // confirm deletion
             if (confirm("Are you sure you want to delete this search from your history?")) {
+                // remove search history item from user's firebase database
                 this.$firebaseRefs.history.child(item['.key']).remove();
             }
         },
 
+        // delete all the user's search history
         deleteAllHistory() {
+            // confirm deletion
             if (confirm("Are you sure you want to clear your search history?")) {
+                // remove user's search history from firebase database
                 this.$firebaseRefs.history.remove();
             }
         },
 
+        // delete all the guest user's search history
+        // can only be done by admin
         deleteGuestHistory() {
+            // confirm deletion
             if (confirm("Are you sure you want to clear the guest search history?")) {
+                // remove the guest search history from the firebase database
                 this.$firebaseRefs.guestHistory.remove();
             }
-        },
-
-        closeInfoDialog() {
-            this.infoDialog = false;
-        },
-
-        exportData() {
-            var app = this;
-            var myWindow = window.open("/data", "Results JSON");
-            myWindow.document.write(JSON.stringify(app.results));
         }
 
     }
