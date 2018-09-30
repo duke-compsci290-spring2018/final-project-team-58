@@ -1,13 +1,21 @@
+<!-- App Info Dialog -->
 <template>
 <v-card class="elevation-12">
+
+    <!-- TOOLBAR -->
     <v-toolbar card dark color="purple darken-4">
+        <!-- title -->
         <v-toolbar-title>About the App</v-toolbar-title>
         <v-spacer></v-spacer>
-        <v-btn icon @click="closeDialog"><v-icon>close</v-icon></v-btn>
+        <!-- close button -->
+        <v-btn icon @click="closeDialog">
+            <v-icon>close</v-icon>
+        </v-btn>
     </v-toolbar>
 
+    <!-- CONTENT -->
     <v-card-text class="pa-5">
-        <h2 class="deep-purple--text text--darken-3 display-1 font-weight-light mb-3">Have you ever wanted to know how Twitter users from all over the world feel about a specific event or topic?</h2> 
+        <h2 class="deep-purple--text text--darken-3 display-1 font-weight-light mb-3">Have you ever wanted to know how Twitter users from all over the world feel about a specific event or topic?</h2>
         <p>
             Twitter hashtags make it easy to find Tweets centering around the same topic, but uncovering the general feelings surrounding that hashtag is more of a challenge. You could search through all those Tweets and find out for yourself, or you could let this app do it for you. All you have to do is choose a hashtag.
         </p>
@@ -69,7 +77,6 @@
         <v-divider class="my-4"></v-divider>
         <h2 class="orange--text text--lighten-3 display-1 font-weight-light mb-3">Who made this?</h2>
         <p class="mb-0"><span class="font-weight-bold">Alina Walling</span> made this for her final project in her Web Development course at Duke University. Check out more about her at her <a class="info" href="https://www.alinawalling.com" target="_blank">personal website</a>! I hear she’s pretty cool :)</p>
-
     </v-card-text>
 </v-card>
 </template>
@@ -77,21 +84,6 @@
 <script>
 export default {
     name: 'InfoDialog',
-
-    props: ["closeDialog"],
-
-    data() {
-        return {
-
-        }
-    },
-
-    methods: {
-
-    }
+    props: ["closeDialog"]
 }
 </script>
-
-<style>
-
-</style>
