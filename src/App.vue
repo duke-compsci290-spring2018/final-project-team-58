@@ -291,7 +291,7 @@ export default {
                 //console.log("user key: " + this.user[".key"]);
                 //console.log("admin object: " + this.admin);
                 //console.log("admin value: " + this.admin[".value"]);
-                if (this.user[".key"] == this.admin[".value"]) {
+                if (this.user[".key"] == this.admin) {
                     console.log("user is admin");
                     return true;
                 }
