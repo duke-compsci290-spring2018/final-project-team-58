@@ -82,6 +82,6 @@ No special instructions are needed to get started with my app.
 
 ### Additional Information
 
-* The responses from the usability testing of the app can be found in the **usability-tests** folder in the main directory.
+* The usability testing was performed with 3 different participants using a Google Form to collect feedback. The responses from the usability testing of the app can be found in the **usability-tests** folder in the main directory. There are two versions of the same file in two different formats: CSV file **usability-testing-results.csv** and Excel file **usability-testing-results.xlsx**. All 3 responses are contained in both files.
 
 * The backup Firebase database JSON file used to reset the database if needed can be found in **src/assets/data/firebase-template.json**
