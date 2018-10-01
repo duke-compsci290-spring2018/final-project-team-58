@@ -17789,10 +17789,10 @@ exports.clearImmediate = (typeof self !== "undefined" && self.clearImmediate) ||
 
     firebase: {
         // key of the admin user
-        admin: {
-            source: __WEBPACK_IMPORTED_MODULE_1__services_firebase__["db"].ref("administrator"),
+        /*admin: {
+            source: db.ref("administrator"),
             asObject: true
-        },
+        },*/
         // guest user search history
         guestHistory: __WEBPACK_IMPORTED_MODULE_1__services_firebase__["db"].ref("users/guest/history")
     },
@@ -17806,6 +17806,7 @@ exports.clearImmediate = (typeof self !== "undefined" && self.clearImmediate) ||
             },
             username: "", // name of the user when registering for an account saved later to Firebase
             signedIn: false, // true when user logged in
+            admin: "", // user ID of admin
             userOptions: false, // true when the user options speed-dial menu is open
             loginDialog: false, // true when user sign in popup dialog is showing
             infoDialog: false, // true when about page popup dialog is showing
@@ -17820,6 +17821,14 @@ exports.clearImmediate = (typeof self !== "undefined" && self.clearImmediate) ||
     // run this function upon creation of the app
     created: function () {
         var app = this;
+
+        // read the administrator value from firebase
+        __WEBPACK_IMPORTED_MODULE_1__services_firebase__["db"].ref("administrator").once("value").then(function (snapshot) {
+            // set the app admin value to value from database
+            if (snapshot.val()) {
+                app.admin = snapshot.val();
+            }
+        });
 
         // check if Firebase user authentication state has changed (user logged in or out)
         __WEBPACK_IMPORTED_MODULE_1__services_firebase__["auth"].onAuthStateChanged(function (user) {
@@ -17922,14 +17931,14 @@ exports.clearImmediate = (typeof self !== "undefined" && self.clearImmediate) ||
         // check if the current logged in user is the admin
         userIsAdmin() {
             if (this.signedIn && this.user != null && this.admin != null) {
-                console.log("user key: " + this.user[".key"]);
-                console.log("admin object: " + this.admin);
-                console.log("admin value: " + this.admin[".value"]);
+                //console.log("user key: " + this.user[".key"]);
+                //console.log("admin object: " + this.admin);
+                //console.log("admin value: " + this.admin[".value"]);
                 if (this.user[".key"] == this.admin[".value"]) {
                     console.log("user is admin");
                     return true;
                 }
-                console.log("user is NOT admin");
+                //console.log("user is NOT admin");
                 return false;
             }
         },
@@ -50598,7 +50607,7 @@ return /******/ (function(modules) { // webpackBootstrap
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_App_vue__ = __webpack_require__(99);
 /* empty harmony namespace reexport */
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_a80a1a28_hasScoped_false_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_App_vue__ = __webpack_require__(611);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_04332bc4_hasScoped_false_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_App_vue__ = __webpack_require__(611);
 function injectStyle (ssrContext) {
   __webpack_require__(212)
 }
@@ -50618,7 +50627,7 @@ var __vue_scopeId__ = null
 var __vue_module_identifier__ = null
 var Component = normalizeComponent(
   __WEBPACK_IMPORTED_MODULE_0__babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_App_vue__["a" /* default */],
-  __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_a80a1a28_hasScoped_false_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_App_vue__["a" /* default */],
+  __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_04332bc4_hasScoped_false_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_App_vue__["a" /* default */],
   __vue_template_functional__,
   __vue_styles__,
   __vue_scopeId__,
@@ -50639,7 +50648,7 @@ var content = __webpack_require__(213);
 if(typeof content === 'string') content = [[module.i, content, '']];
 if(content.locals) module.exports = content.locals;
 // add the styles to the DOM
-var update = __webpack_require__(22)("6fb688b4", content, true, {});
+var update = __webpack_require__(22)("5392258d", content, true, {});
 
 /***/ }),
 /* 213 */
