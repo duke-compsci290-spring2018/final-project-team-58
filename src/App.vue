@@ -144,11 +144,6 @@ export default {
     },
 
     firebase: {
-        // key of the admin user
-        /*admin: {
-            source: db.ref("administrator"),
-            asObject: true
-        },*/
         // guest user search history
         guestHistory: db.ref("users/guest/history")
     },
