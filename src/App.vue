@@ -145,10 +145,10 @@ export default {
 
     firebase: {
         // key of the admin user
-        admin: {
+        /*admin: {
             source: db.ref("administrator"),
             asObject: true
-        },
+        },*/
         // guest user search history
         guestHistory: db.ref("users/guest/history")
     },
@@ -162,6 +162,7 @@ export default {
             },
             username: "", // name of the user when registering for an account saved later to Firebase
             signedIn: false, // true when user logged in
+            admin: "",  // user ID of admin
             userOptions: false, // true when the user options speed-dial menu is open
             loginDialog: false, // true when user sign in popup dialog is showing
             infoDialog: false, // true when about page popup dialog is showing
@@ -176,6 +177,14 @@ export default {
     // run this function upon creation of the app
     created: function () {
         var app = this;
+
+        // read the administrator value from firebase
+        db.ref("administrator").once("value").then(function (snapshot) {
+            // set the app admin value to value from database
+            if (snapshot.val()) {
+                app.admin = snapshot.val();
+            }
+        });
 
         // check if Firebase user authentication state has changed (user logged in or out)
         auth.onAuthStateChanged(function (user) {
@@ -249,6 +258,7 @@ export default {
                 }
             }
         });
+
     },
 
     computed: {
