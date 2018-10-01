@@ -71,7 +71,7 @@ No extra credit features to report.
 
 ## About the Project
 
-**What makes my application useful?**
+#### What makes my application useful?
 The world is filled with tension over current events, excitment over popular TV shows, strong opinions about a famous person, and many more emotions. Perhaps data that can help us to understand the emotions of others as we all uniquely experience these events can serve to foster more empathy and relieve tension. Truthfully, we could all use some more empathy. But where do we start?
 
 The idea for my app was simple: I wanted to find out how Twitter users from all over the world feel about specific events or topics defined in Twitter hashtags. Thanks to IBM Watson's Tone Analyzer and Personality Insights, retrieving emotion and personality data about Twitter hashtags is easier than ever. With a simple idea and the tools to execute it, the magic of my app lies in the integration of 3 APIs to display a collective of data not otherwise possible to view side-by-side. Information about Tweets, tone, and personality is insightful separately, but together they can be life changing.
@@ -83,17 +83,17 @@ In looking at the graphs of the tone analysis and personality characteristics, t
 Whether you’re curious about how your opinions stack up against others about something silly or about something important, we have increasingly more technological tools to uncover and understand human emotions, and I used them in my application. I think many people would greatly benefit from easy access to these tools in my app, because it provides a new opportunity to build emotional intelligence. The more we can understand and empathize with one another, the better our world will be. So you could continue to struggle to understand human emotion on your own, or you could let my app understand them for you. All you have to do is choose a hashtag.
 
 
-**Special instructions need to set up, run, access, or use my application:**
+#### Special instructions need to set up, run, access, or use my application:
 No special instructions are needed to get started with my app.
 
 
-**References for my data that establishes its authenticity:**
+#### References for my data that establishes its authenticity:
 * The Twitter Tweets data are retrieved using [Twitter's Premium Search API](https://developer.twitter.com/en/docs/tweets/search/overview/premium)
 * The IBM Watson Tone Analyzer tone analysis data are retrieved using [IBM Watson's Tone Analyzer API]()
 * The IBM Watson Personality Insights profile data are retrieved using [IBM Watson's Personality Insights API]()
 
 
-**How I chose my frameworks:**
+#### How I chose my frameworks:
 Truthfully, I didn't have many difficult decisions to make about what frameworks I would use for my app. I essentially needed to choose my front-end framework, style framework, and data visualization framework. In general, I liked to stick to what I know to make the development process focused on creating a good app rather than trying to learn something completely new in the process.
 
 I chose to use **Vue.js** because I knew it well and it had the functionality I needed for my app. We learned it in class and I was comfortable using it; I didn't want to spend a lot of additional time trying to learn a new framework while building an entire app from scratch. I had to learn how to implement other features of my app, so I wanted to rely on Vue as something I knew how to use. My app heavily relies on displaying data rather than having extensive interactive features, so a reactive front-end framework like Vue was exactly what I needed to effectively display the data.
