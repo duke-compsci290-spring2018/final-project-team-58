@@ -427,6 +427,7 @@ export default {
             // check a user is logged in and confirm the sign out
             if (auth.currentUser && confirm("Are you sure you want to log out?")) {
                 this.setPage("home");
+                this.loginDialog = false;
                 auth.signOut();
             }
         },
