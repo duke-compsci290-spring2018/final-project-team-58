@@ -1,14 +1,14 @@
 // API keys for Watson Tone Analyzer
-const WATSON_TONE_ANALYZER_USER = "fe8a6e93-7956-4537-88f6-cc2aeaf467a1"
-const WATSON_TONE_ANALYZER_PASS = "orFyEbGYJmQg"
+const WATSON_TONE_ANALYZER_USER = "fe8a6e93-7956-4537-88f6-cc2aeaf467a1";
+const WATSON_TONE_ANALYZER_PASS = "orFyEbGYJmQg";
 
 // API keys for Watson Personality Insights
-const WATSON_PERSONALITY_INSIGHTS_USER = "8aaaf6cd-bbcd-4016-867c-4302346159b6"
-const WATSON_PERSONALITY_INSIGHTS_PASS = "5KJdgHMx1ywn"
+const WATSON_PERSONALITY_INSIGHTS_USER = "8aaaf6cd-bbcd-4016-867c-4302346159b6";
+const WATSON_PERSONALITY_INSIGHTS_PASS = "5KJdgHMx1ywn";
 
 // create Tone Analyzer and Personality Insights objects from Watson Node SDK
-const ToneAnalyzerV3 = require("watson-developer-cloud/tone-analyzer/v3")
-const PersonalityInsightsV3 = require("watson-developer-cloud/personality-insights/v3")
+const ToneAnalyzerV3 = require("watson-developer-cloud/tone-analyzer/v3");
+const PersonalityInsightsV3 = require("watson-developer-cloud/personality-insights/v3");
 
 // configure Tone Analyzer with credentials
 const toneAnalyzer = new ToneAnalyzerV3({
@@ -44,14 +44,14 @@ exports.analyzeTone = function (req, res) {
             console.log(error);
             res.send("error: " + error);
             res.end();
-        } 
+        }
         // send response data back to request
         else {
             res.send(toneAnalysis);
             res.end();
         }
     });
-}
+};
 
 // analyze personality function sent by server
 exports.analyzePersonality = function (req, res) {
@@ -62,8 +62,8 @@ exports.analyzePersonality = function (req, res) {
         content: content,
         content_type: "application/json",
         consumption_preferences: true
-    }
-    
+    };
+
     // use Personality Insights object to make request with parameters
     personalityInsights.profile(personalityParams, function (error, profile) {
         // catch an error and end request
@@ -71,11 +71,11 @@ exports.analyzePersonality = function (req, res) {
             console.log(error);
             res.send("error: " + error);
             res.end();
-        } 
+        }
         // send response data back to request
         else {
             res.send(profile);
             res.end();
         }
     });
-}
+};

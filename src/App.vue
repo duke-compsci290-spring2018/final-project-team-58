@@ -110,33 +110,27 @@
 
 <script>
 // import Vue
-import Vue from "vue"
+import Vue from "vue";
 
 // import Firebase
 import {
     firebase,
     auth,
     db
-} from "./services/firebase"
-
-// import Watson AI services
-import {
-    toneAnalyzer,
-    personalityInsights
-} from "./services/watsonAI"
+} from "./services/firebase";
 
 // import URL to server backend accessing APIs
 import {
     API_URL
-} from './config'
+} from './config';
 
 // import components
-import Search from "./components/Search.vue"
-import Results from "./components/Results.vue"
-import LoginForm from "./components/LoginForm.vue"
-import AccountSettings from "./components/AccountSettings.vue"
-import Compare from "./components/Compare.vue"
-import InfoDialog from "./components/InfoDialog.vue"
+import Search from "./components/Search.vue";
+import Results from "./components/Results.vue";
+import LoginForm from "./components/LoginForm.vue";
+import AccountSettings from "./components/AccountSettings.vue";
+import Compare from "./components/Compare.vue";
+import InfoDialog from "./components/InfoDialog.vue";
 
 export default {
     name: 'App',
@@ -158,25 +152,25 @@ export default {
         // guest user search history
         guestHistory: db.ref("users/guest/history")
     },
-    
+
     data() {
         return {
-            page: "home",           // current page displayed on app
-            message: {              // message text for displaying errors and notifications to user
+            page: "home", // current page displayed on app
+            message: { // message text for displaying errors and notifications to user
                 visible: false,
                 text: ""
             },
-            username: "",           // name of the user when registering for an account saved later to Firebase
-            signedIn: false,        // true when user logged in
-            userOptions: false,     // true when the user options speed-dial menu is open
-            loginDialog: false,     // true when user sign in popup dialog is showing
-            infoDialog: false,      // true when about page popup dialog is showing
-            searchQuery: "",        // search text typed into search input
-            loading: false,         // true when search submitted and loading dialog is showing
-            results: {},            // stores the results about the search grabbed from the APIs
-            isBookmark: false,      // true when the results being displayed are bookmarked
-            toCompare: []           // two results data sets displayed on compare page
-        }
+            username: "", // name of the user when registering for an account saved later to Firebase
+            signedIn: false, // true when user logged in
+            userOptions: false, // true when the user options speed-dial menu is open
+            loginDialog: false, // true when user sign in popup dialog is showing
+            infoDialog: false, // true when about page popup dialog is showing
+            searchQuery: "", // search text typed into search input
+            loading: false, // true when search submitted and loading dialog is showing
+            results: {}, // stores the results about the search grabbed from the APIs
+            isBookmark: false, // true when the results being displayed are bookmarked
+            toCompare: [] // two results data sets displayed on compare page
+        };
     },
 
     // run this function upon creation of the app
@@ -243,7 +237,7 @@ export default {
                     }
                 });
 
-            // if no user is signed in
+                // if no user is signed in
             } else {
                 app.signedIn = false;
                 app.username = "";
@@ -296,11 +290,11 @@ export default {
                             // get the search history of all users and add it to universal array
                             for (var u in val) {
                                 if (val[u].hasOwnProperty("history")) {
-                                    for (var item in val[u]["history"]) {
+                                    for (var item in val[u].history) {
                                         master.push({
-                                            user: val[u]["name"],
-                                            name: val[u]["history"][item]["name"],
-                                            timestamp: val[u]["history"][item]["timestamp"]
+                                            user: val[u].name,
+                                            name: val[u].history[item].name,
+                                            timestamp: val[u].history[item].timestamp
                                         });
                                     }
                                 }
@@ -308,7 +302,7 @@ export default {
                         }
                     });
                 }
-            };
+            }
             // return universal array
             return master;
         }
@@ -351,14 +345,14 @@ export default {
                         this.resetResults();
                     }
                 }
-            } 
+            }
             // confirm to leave compare page
             else if (this.page == "compare") {
                 if (confirm("Are you sure you want to leave this page?")) {
                     this.setPage(newPage);
                     this.resetCompare();
                 }
-            } 
+            }
             // if not a sensitive data page just go to new page
             else {
                 this.setPage(newPage);
@@ -473,12 +467,12 @@ export default {
                     }).catch(function (error) {
                         // display error message about reauthenticating user
                         console.log(error);
-                        app.displayMessage("Unable to reauthenticate account credentials.")
+                        app.displayMessage("Unable to reauthenticate account credentials.");
                         // An error happened.
                     });
                 } else {
                     // prompt user to enter password in addition to email for changing email address
-                    this.displayMessage("Please enter your password before changing your email address.")
+                    this.displayMessage("Please enter your password before changing your email address.");
                 }
             }
         },
@@ -493,16 +487,16 @@ export default {
                 // update password in firebase auth
                 auth.currentUser.updatePassword(newPassword).then(function () {
                     // display confirmation message
-                    app.displayMessage("Password successfully updated.")
+                    app.displayMessage("Password successfully updated.");
                 }).catch(function (error) {
                     // display error message about saving password
                     console.log(error);
-                    app.displayMessage("Unable to update password.")
+                    app.displayMessage("Unable to update password.");
                 });
             }).catch(function (error) {
                 // display error message about reauthenticating user
                 console.log(error);
-                app.displayMessage("Unable to reauthenticate account credentials.")
+                app.displayMessage("Unable to reauthenticate account credentials.");
             });
         },
 
@@ -514,7 +508,7 @@ export default {
             // confirm with user about deleting account
             if (confirm("Are you sure you want to delete your account? This cannot be undone!")) {
                 if (confirm("Are you SUPER SURE you want to delete your account? This is your last chance to change your mind.")) {
-                    
+
                     // create credential with email and password
                     const credential = firebase.auth.EmailAuthProvider.credential(email, password);
                     // reauthenticate user credentials
@@ -717,11 +711,11 @@ export default {
         // submit the search query to Twitter API and retreive Tweet data
         searchTweets() {
             var app = this;
-            
+
             // save the search query as a parameter for Twitter API request
             var query = {
                 "query": "#" + app.results.query
-            }
+            };
 
             //console.log(query);
 
@@ -748,7 +742,7 @@ export default {
                     for (var i = 0; i < tweets.length; i++) {
                         // parse out only relevant data of each Tweet and save in results object array
                         app.results.tweets.push(app.parseTweetObject(tweets[i]));
-                    };
+                    }
 
                     //console.log(app.results.tweets);
 
@@ -768,9 +762,9 @@ export default {
             var t = {};
             // save the timestamp, id, and text from each Tweet
             // don't worry about information about the Twitter user, location, etc.
-            t.timestamp = tweet["created_at"];
-            t.id = tweet["id_str"];
-            t.text = tweet["text"];
+            t.timestamp = tweet.created_at;
+            t.id = tweet.id_str;
+            t.text = tweet.text;
             // return parsed Tweet object
             return t;
         },
@@ -813,7 +807,7 @@ export default {
                 // use the JSON data
                 .then(data => {
                     //console.log(data);
-                    
+
                     // set the app results object tones to the tones found in the data
                     Vue.set(app.results, "tones", data.document_tone.tones);
                 })
@@ -946,7 +940,7 @@ export default {
                     name: app.results.query,
                     timestamp: date.toLocaleString()
                 });
-            } 
+            }
             // if no user signed in...
             else {
                 // add information about the search to guest user search history
