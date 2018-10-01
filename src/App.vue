@@ -278,14 +278,14 @@ export default {
         // check if the current logged in user is the admin
         userIsAdmin() {
             if (this.signedIn && this.user != null && this.admin != null) {
-                console.log("user key: " + this.user[".key"]);
-                console.log("admin object: " + this.admin);
-                console.log("admin value: " + this.admin[".value"]);
+                //console.log("user key: " + this.user[".key"]);
+                //console.log("admin object: " + this.admin);
+                //console.log("admin value: " + this.admin[".value"]);
                 if (this.user[".key"] == this.admin[".value"]) {
                     console.log("user is admin");
                     return true;
                 }
-                console.log("user is NOT admin");
+                //console.log("user is NOT admin");
                 return false;
             }
 
