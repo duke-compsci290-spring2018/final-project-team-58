@@ -71,7 +71,7 @@
             <!-- compare results page showing two results data sets side-by-side -->
             <compare v-cloak v-if="page == 'compare'" :search-a="toCompare[0]" :search-b="toCompare[1]"></compare>
             <!-- account settings page to view user info if logged in -->
-            <account-settings v-if="goToAccountPage" :user="user" :curr-tab="page" :view-bookmark="viewBookmark" :compare-bookmarks="compareResults" :delete-bookmark="deleteBookmark" :delete-all-bookmarks="deleteAllBookmarks" :delete-history-item="deleteHistoryItem" :delete-all-history="deleteAllHistory" :update-profile="updateProfile" :update-password="updatePassword" :delete-account="deleteAccount" :set-page="setPage" :master-history="masterHistory" :delete-guest-history="deleteGuestHistory" :admin="admin['.value']"></account-settings>
+            <account-settings v-if="goToAccountPage" :user="user" :curr-tab="page" :view-bookmark="viewBookmark" :compare-bookmarks="compareResults" :delete-bookmark="deleteBookmark" :delete-all-bookmarks="deleteAllBookmarks" :delete-history-item="deleteHistoryItem" :delete-all-history="deleteAllHistory" :update-profile="updateProfile" :update-password="updatePassword" :delete-account="deleteAccount" :set-page="setPage" :master-history="masterHistory" :delete-guest-history="deleteGuestHistory" :admin="userIsAdmin"></account-settings>
         </v-content>
 
         <!-- loading dialog displayed while search is submitting -->
@@ -275,34 +275,49 @@ export default {
             return false;
         },
 
+        // check if the current logged in user is the admin
+        userIsAdmin() {
+            if (this.signedIn && this.user != null && this.admin != null) {
+                console.log("user key: " + this.user[".key"]);
+                console.log("admin object: " + this.admin);
+                console.log("admin value: " + this.admin[".value"]);
+                if (this.user[".key"] == this.admin[".value"]) {
+                    console.log("user is admin");
+                    return true;
+                }
+                console.log("user is NOT admin");
+                return false;
+            }
+
+        },
+
         // generates the master search history of all user accounts and guest account
         // list of master search history is viewable by the admin account
         masterHistory() {
             var master = [];
-            // check if user
-            if (this.signedIn && this.user != null) {
-                // check if user is admin
-                if (this.user[".key"] == this.admin[".value"]) {
-                    // grab all the user info from firebase database
-                    db.ref("users").once("value").then(function (snapshot) {
-                        var val = snapshot.val();
-                        if (val) {
-                            // get the search history of all users and add it to universal array
-                            for (var u in val) {
-                                if (val[u].hasOwnProperty("history")) {
-                                    for (var item in val[u].history) {
-                                        master.push({
-                                            user: val[u].name,
-                                            name: val[u].history[item].name,
-                                            timestamp: val[u].history[item].timestamp
-                                        });
-                                    }
+
+            // check if user is admin
+            if (this.userIsAdmin) {
+                // grab all the user info from firebase database
+                db.ref("users").once("value").then(function (snapshot) {
+                    var val = snapshot.val();
+                    if (val) {
+                        // get the search history of all users and add it to universal array
+                        for (var u in val) {
+                            if (val[u].hasOwnProperty("history")) {
+                                for (var item in val[u].history) {
+                                    master.push({
+                                        user: val[u].name,
+                                        name: val[u].history[item].name,
+                                        timestamp: val[u].history[item].timestamp
+                                    });
                                 }
                             }
                         }
-                    });
-                }
+                    }
+                });
             }
+
             // return universal array
             return master;
         }

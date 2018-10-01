@@ -25,7 +25,7 @@
                             </v-tab>
                             <!-- master search history -->
                             <!-- displayed if user is the admin -->
-                            <v-tab href="#account-master-history" v-if="user['.key'] == admin">
+                            <v-tab href="#account-master-history" v-if="admin">
                                 <v-icon dark>supervised_user_circle</v-icon>
                             </v-tab>
                             <!-- settings -->
@@ -123,7 +123,7 @@
 
                         <!-- MASTER SEARCH HISTORY TAB -->
                         <!-- displayed only if user is admin -->
-                        <v-tab-item id="account-master-history" v-if="user['.key'] == admin">
+                        <v-tab-item id="account-master-history" v-if="admin">
                             <!-- title and search master history -->
                             <v-card-title>
                                 <h5 class="title mb-0 mt-2">Master History</h5>
@@ -159,7 +159,7 @@
                             <v-card-title>
                                 <h5 class="title">Profile</h5>
                                 <v-spacer></v-spacer>
-                                <h5 class="body-2 grey--text text-uppercase" v-if="user['.key'] == admin">Administrator</h5>
+                                <h5 class="body-2 grey--text text-uppercase" v-if="admin">Administrator</h5>
                             </v-card-title>
                             <!-- edit profile -->
                             <v-form>
@@ -226,7 +226,7 @@ export default {
     
     props: [
         "user",                 // user object who is logged in
-        "admin",                // key of the admin user
+        "admin",                // true if user is admin
         "currTab",              // current tab viewing on the account settings tabs
         "setPage",              // set page function to new page
         "viewBookmark",         // view a bookmark

@@ -179,7 +179,6 @@ import PersonalitySummary from "./PersonalitySummary.vue"
 import PersonalityPreferences from "./PersonalityPreferences.vue"
 import PersonalityChart from "./PersonalityChart.vue"
 import ToneChart from "./ToneChart.vue"
-import ResultsSummary from "./ResultsSummary.vue"
 
 export default {
     name: 'Compare',
